@@ -6,6 +6,7 @@ import { Toaster } from 'react-hot-toast';
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://guiaparacuru.com.br'),
   title: 'Guia Paracuru - Carnaval 2026',
   description: 'Seu guia completo para o Carnaval de Paracuru 2026',
   keywords: ['Paracuru', 'Carnaval', 'Ceará', 'Turismo', 'Eventos'],

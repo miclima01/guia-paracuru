@@ -19,10 +19,10 @@ export default function NoticiasPage() {
   async function loadNews() {
     const { data } = await supabase
       .from('news')
-      .select('*')
+      .select('id,title,summary,image_url,category,is_featured,published_at')
       .order('published_at', { ascending: false });
 
-    if (data) setNews(data);
+    if (data) setNews(data as NewsArticle[]);
     setLoading(false);
   }
 

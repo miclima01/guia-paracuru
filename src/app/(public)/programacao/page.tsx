@@ -23,12 +23,12 @@ export default function ProgramacaoPage() {
     try {
       const { data } = await supabase
         .from('attractions')
-        .select('*')
+        .select('id,name,description,date,start_time,end_time,location,artist,image_url,is_premium,is_featured,location_url')
         .order('date')
         .order('start_time');
 
       if (data) {
-        setAttractions(data);
+        setAttractions(data as Attraction[]);
         if (data.length > 0 && !selectedDate) {
           // Set default to first date (or today if exists)
           const today = new Date().toISOString().split('T')[0];

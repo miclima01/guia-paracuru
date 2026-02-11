@@ -13,7 +13,6 @@ async function ensureAdmin() {
 
 export async function getAdminItems(table: string, options?: { orderBy?: { column: string; ascending?: boolean }; filter?: { column: string; value: any } }) {
     await ensureAdmin();
-    console.log(`[AdminAction] Fetching ${table}`);
     const supabase = createAdminClient();
 
     let query = supabase.from(table).select('*');

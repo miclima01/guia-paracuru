@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Beer, MapPin, Phone, Instagram, Search, Store } from 'lucide-react';
+import Image from 'next/image';
+import { Beer, MapPin, Search, Store } from 'lucide-react';
 import type { Business, BusinessCategory } from '@/types';
 import { CATEGORY_LABELS } from '@/lib/utils';
 import EstablishmentModal from '@/components/public/EstablishmentModal';
@@ -33,12 +34,12 @@ export default function GastronomiaPage() {
             try {
                 let query = supabase
                     .from('businesses')
-                    .select('*')
+                    .select('id,name,description,category,address,phone,whatsapp,instagram,website,image_url,latitude,longitude,is_partner,is_premium,is_featured')
                     .order('is_featured', { ascending: false })
                     .order('name');
 
                 const { data } = await query;
-                if (data) setBusinesses(data);
+                if (data) setBusinesses(data as Business[]);
             } catch (error) {
                 console.error('Erro ao carregar locais:', error);
             } finally {
@@ -119,7 +120,7 @@ export default function GastronomiaPage() {
                             >
                                 <div className="h-32 bg-surface-100 relative">
                                     {biz.image_url ? (
-                                        <img src={biz.image_url} alt={biz.name} className="w-full h-full object-cover" />
+                                        <Image src={biz.image_url} alt={biz.name} className="object-cover" fill sizes="(max-width: 640px) 100vw, 50vw" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-surface-300">
                                             <Store size={32} />

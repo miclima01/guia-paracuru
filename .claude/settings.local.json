@@ -2,7 +2,22 @@
   "permissions": {
     "allow": [
       "Bash(npm install)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(gh api:*)",
+      "Bash(where:*)",
+      "Bash(npx vercel:*)",
+      "WebFetch(domain:guia-paracuru.vercel.app)",
+      "Bash(curl:*)",
+      "Bash(findstr:*)",
+      "Bash(git fetch:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git config:*)",
+      "Bash(git add:*)",
+      "Bash(find:*)",
+      "Bash(del:*)",
+      "Bash(npx next build:*)",
+      "Bash(npx next dev)"
     ]
   }
 }

@@ -100,13 +100,6 @@ export interface AppSetting {
   updated_at: string;
 }
 
-// UI types
-export interface CategoryOption {
-  value: string;
-  label: string;
-  icon?: string;
-}
-
 export type NewsCategory = 'geral' | 'avisos' | 'eventos' | 'turismo' | 'seguranca';
 
 export type BusinessCategory =

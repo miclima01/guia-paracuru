@@ -1,4 +1,4 @@
-import { BusinessCategory, EmergencyCategory, NewsCategory } from '@/types';
+import { BusinessCategory, NewsCategory } from '@/types';
 
 // Date formatting
 export function formatDateTime(date: string | Date): string {
@@ -73,32 +73,22 @@ export function formatPhone(phone: string): string {
   return phone;
 }
 
-// String utilities
-export function truncate(str: string, length: number): string {
-  if (str.length <= length) return str;
-  return str.substring(0, length) + '...';
-}
-
-export function slugify(str: string): string {
-  return str
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
-}
-
-// Validation
-export function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-export function isValidPhone(phone: string): boolean {
-  const cleaned = phone.replace(/\D/g, '');
-  return cleaned.length >= 10 && cleaned.length <= 11;
-}
-
 // Class names helper
 export function cn(...classes: (string | undefined | null | false)[]): string {
   return classes.filter(Boolean).join(' ');
+}
+
+// Sanitize HTML - strip dangerous tags/attributes, keep safe formatting
+export function sanitizeHtml(html: string): string {
+  // Remove script tags and their content
+  let clean = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  // Remove event handlers (onclick, onerror, etc.)
+  clean = clean.replace(/\s*on\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)/gi, '');
+  // Remove javascript: URLs
+  clean = clean.replace(/href\s*=\s*(?:"javascript:[^"]*"|'javascript:[^']*')/gi, '');
+  // Remove iframe, object, embed, form tags
+  clean = clean.replace(/<\/?(iframe|object|embed|form|input|textarea|button|select)\b[^>]*>/gi, '');
+  // Remove style tags and their content
+  clean = clean.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+  return clean;
 }

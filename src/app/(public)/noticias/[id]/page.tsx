@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Calendar } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { formatDateTime, NEWS_CATEGORY_LABELS } from '@/lib/utils';
+import { formatDateTime, NEWS_CATEGORY_LABELS, sanitizeHtml } from '@/lib/utils';
 import type { NewsArticle, NewsCategory } from '@/types';
 
 export default function NoticiaDetailPage({ params }: { params: { id: string } }) {
@@ -93,7 +93,7 @@ export default function NoticiaDetailPage({ params }: { params: { id: string } }
 
           <div
             className="mt-6 text-surface-700 leading-relaxed whitespace-pre-wrap"
-            dangerouslySetInnerHTML={{ __html: article.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(article.content) }}
           />
         </div>
       </div>

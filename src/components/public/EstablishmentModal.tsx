@@ -2,6 +2,7 @@
 
 import { Business, BusinessCategory } from '@/types';
 import { CATEGORY_LABELS, formatPhone } from '@/lib/utils';
+import Image from 'next/image';
 import { X, MapPin, Phone, Instagram, Globe } from 'lucide-react';
 import { useEffect } from 'react';
 
@@ -53,10 +54,12 @@ export default function EstablishmentModal({ business, isOpen, onClose }: Establ
                 {/* Header Image */}
                 <div className="relative h-48 bg-surface-200 rounded-t-2xl overflow-hidden">
                     {business.image_url ? (
-                        <img
+                        <Image
                             src={business.image_url}
                             alt={business.name}
                             className="w-full h-full object-cover"
+                            fill
+                            sizes="(max-width: 672px) 100vw, 672px"
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-surface-100 to-surface-200">

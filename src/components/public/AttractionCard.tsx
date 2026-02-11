@@ -1,9 +1,9 @@
 'use client';
 
+import Image from 'next/image';
 import { MapPin, Music, Star, Lock } from 'lucide-react';
 import { Attraction } from '@/types';
-import { formatTime } from '@/lib/utils';
-import { cn } from '@/lib/utils';
+import { formatTime, cn } from '@/lib/utils';
 
 interface AttractionCardProps {
     attraction: Attraction;
@@ -24,10 +24,12 @@ export default function AttractionCard({ attraction, isPremium, onUnlock }: Attr
             {/* Image / Cover */}
             <div className="relative h-44 md:min-h-[11rem] md:w-44 md:min-w-[176px] bg-surface-100 flex-shrink-0">
                 {attraction.image_url ? (
-                    <img
+                    <Image
                         src={attraction.image_url}
                         alt={attraction.name}
-                        className="absolute inset-0 w-full h-full object-cover"
+                        className="object-cover"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 176px"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-surface-300">

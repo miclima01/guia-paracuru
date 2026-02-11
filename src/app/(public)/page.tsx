@@ -1,25 +1,25 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import {
   Calendar, MapPin, Newspaper, Phone, Store, ChevronRight,
-  Clock, Shield, Star, Sparkles, ArrowRight, Music,
+  Shield, Star, ArrowRight, Music,
   Beer, ShoppingBag, Car, Lock
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { formatDateTime, EMERGENCY_ICONS, CATEGORY_LABELS, formatPhone } from '@/lib/utils';
+import { CATEGORY_LABELS } from '@/lib/utils';
 import { useAppStore } from '@/hooks/useStore';
-import PremiumGate from '@/components/public/PremiumGate';
 import NewsSlider from '@/components/public/NewsSlider';
 import EstablishmentModal from '@/components/public/EstablishmentModal';
 
-import type { NewsArticle, Business, EmergencyContact, BusinessCategory } from '@/types';
+import type { NewsArticle, Business, BusinessCategory } from '@/types';
 
 export default function HomePage() {
+  const router = useRouter();
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [featured, setFeatured] = useState<Business[]>([]);
-  const [contacts, setContacts] = useState<EmergencyContact[]>([]);
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -29,15 +29,11 @@ export default function HomePage() {
   useEffect(() => {
     // Fetch main content
     Promise.all([
-      supabase.from('news').select('*').order('published_at', { ascending: false }).limit(3),
-      supabase.from('businesses').select('*').eq('is_featured', true).order('order_index').limit(4),
-      supabase.from('emergency_contacts').select('*').order('order_index').limit(4),
-    ]).then(([newsRes, bizRes, contactRes]) => {
-      if (newsRes.data) setNews(newsRes.data);
-      if (bizRes.data) setFeatured(bizRes.data);
-      if (contactRes.data) setContacts(contactRes.data);
-    }).catch(err => {
-      console.error('Error fetching home data:', err);
+      supabase.from('news').select('id,title,summary,image_url,category,published_at').order('published_at', { ascending: false }).limit(3),
+      supabase.from('businesses').select('id,name,description,category,image_url,is_partner,is_featured').eq('is_featured', true).order('order_index').limit(4),
+    ]).then(([newsRes, bizRes]) => {
+      if (newsRes.data) setNews(newsRes.data as NewsArticle[]);
+      if (bizRes.data) setFeatured(bizRes.data as Business[]);
     });
 
     // Fetch settings independently to avoid blocking main content
@@ -62,15 +58,17 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      {/* Hero */}
       <section className="px-4 pt-4 pb-2 max-w-2xl mx-auto">
         <div className="relative overflow-hidden rounded-xl shadow-xl carnival-gradient-dark">
           {heroImage && (
             <div className="absolute inset-0 z-0">
-              <img
+              <Image
                 src={heroImage}
                 alt="Carnaval Background"
                 className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 672px) 100vw, 672px"
+                priority
                 onError={() => setHeroImage(null)}
               />
               <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
@@ -103,7 +101,7 @@ export default function HomePage() {
                     e.preventDefault();
                     openPaymentModal();
                   } else {
-                    window.location.href = '/programacao';
+                    router.push('/programacao');
                   }
                 }}
                 className="inline-flex items-center gap-2 mt-6 px-6 py-3 rounded-xl bg-white/15 backdrop-blur-sm border border-white/20 text-white font-semibold text-sm hover:bg-white/25 transition-all active:scale-95 shadow-lg"
@@ -129,7 +127,7 @@ export default function HomePage() {
                   if (!isPremium) {
                     openPaymentModal();
                   } else {
-                    window.location.href = link.href;
+                    router.push(link.href);
                   }
                 }}
                 className="group relative overflow-hidden rounded-xl p-4 text-white shadow-lg active:scale-[0.97] transition-all min-w-[160px] flex-1 text-left"
@@ -155,7 +153,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-lg text-surface-900">Últimas Notícias</h2>
             <button
-              onClick={() => !isPremium ? openPaymentModal() : window.location.href = '/noticias'}
+              onClick={() => !isPremium ? openPaymentModal() : router.push('/noticias')}
               className="text-xs text-fire-600 font-semibold flex items-center gap-1"
             >
               {!isPremium && <Lock size={12} />}
@@ -180,9 +178,6 @@ export default function HomePage() {
           </div>
         </section>
       )}
-
-      {/* Next Attractions */}
-
 
       {/* Featured Businesses */}
       {featured.length > 0 && (
@@ -214,7 +209,7 @@ export default function HomePage() {
                 )}
                 <div className="h-[60%] bg-surface-100 overflow-hidden relative">
                   {biz.image_url ? (
-                    <img src={biz.image_url} alt={biz.name} className="w-full h-full object-cover" />
+                    <Image src={biz.image_url} alt={biz.name} className="w-full h-full object-cover" fill sizes="242px" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-surface-300">
                       <Store size={28} />
@@ -240,7 +235,7 @@ export default function HomePage() {
       <section className="px-4 mt-8 mb-6 max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-display text-lg text-surface-900">Contatos de Emergência</h2>
-          <button onClick={() => !isPremium ? openPaymentModal() : window.location.href = '/contatos'} className="text-xs text-fire-600 font-semibold flex items-center gap-1">
+          <button onClick={() => !isPremium ? openPaymentModal() : router.push('/contatos')} className="text-xs text-fire-600 font-semibold flex items-center gap-1">
             {!isPremium && <Lock size={12} />}
             Ver todos <ChevronRight size={14} />
           </button>
@@ -273,7 +268,7 @@ export default function HomePage() {
           </a>
 
           {/* Taxi */}
-          <button onClick={() => !isPremium ? openPaymentModal() : window.location.href = '/contatos'} className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all relative overflow-hidden group text-left">
+          <button onClick={() => !isPremium ? openPaymentModal() : router.push('/contatos')} className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all relative overflow-hidden group text-left">
             <div className="flex items-start justify-between mb-3 w-full">
               <div className="w-10 h-10 rounded-xl bg-amber-400 flex items-center justify-center shadow-sm">
                 <Car size={20} className="text-white" />
@@ -293,7 +288,7 @@ export default function HomePage() {
           </button>
 
           {/* Mototaxi */}
-          <button onClick={() => !isPremium ? openPaymentModal() : window.location.href = '/contatos'} className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all relative overflow-hidden group text-left">
+          <button onClick={() => !isPremium ? openPaymentModal() : router.push('/contatos')} className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all relative overflow-hidden group text-left">
             <div className="flex items-start justify-between mb-3 w-full">
               <div className="w-10 h-10 rounded-xl bg-green-500 flex items-center justify-center shadow-sm">
                 <Car size={20} className="text-white" />
@@ -338,7 +333,6 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Establishment Modal */}
       <EstablishmentModal
         business={selectedBusiness}
         isOpen={isModalOpen}
@@ -347,9 +341,6 @@ export default function HomePage() {
           setSelectedBusiness(null);
         }}
       />
-
-      {/* Attraction Modal */}
-
     </div>
   );
 }
