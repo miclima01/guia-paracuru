@@ -8,7 +8,6 @@ const nextConfig = {
       },
     ],
   },
-  // Force rebuild
 }
 
 module.exports = nextConfig
