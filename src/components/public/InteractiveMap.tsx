@@ -71,16 +71,18 @@ function createCategoryIcon(category: string) {
 // Component to fit bounds when businesses change
 function FitBounds({ businesses }: { businesses: Business[] }) {
   const map = useMap();
-  const prevLength = useRef(businesses.length);
+  const initRef = useRef(false);
 
   useEffect(() => {
-    if (businesses.length > 0 && businesses.length !== prevLength.current) {
+    if (businesses.length > 0 && !initRef.current) {
       const bounds = L.latLngBounds(
         businesses.map((b) => [b.latitude!, b.longitude!] as [number, number])
       );
-      map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 });
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 });
+        initRef.current = true;
+      }
     }
-    prevLength.current = businesses.length;
   }, [businesses, map]);
 
   return null;
@@ -95,7 +97,8 @@ export default function InteractiveMap({ businesses }: InteractiveMapProps) {
     (b) => b.latitude != null && b.longitude != null
   );
 
-  const PARACURU_CENTER: [number, number] = [-3.4070, -39.0150];
+  // Paracuru City aligned center
+  const PARACURU_CENTER: [number, number] = [-3.4120, -39.0315];
 
   return (
     <div className="relative flex flex-col" style={{ height: 'calc(100vh - 200px)', minHeight: '400px' }}>

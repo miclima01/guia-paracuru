@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { Save, Upload } from 'lucide-react';
+import { Save, Upload, Calendar, MapPin, DollarSign, Palette, MessageCircle, Crown, Globe, Image as ImageIcon } from 'lucide-react';
 import { getSettings, saveSettings, uploadHeroImage } from '@/actions/admin-actions';
 import toast from 'react-hot-toast';
 
@@ -12,51 +12,65 @@ interface Setting {
   label: string;
   type: 'text' | 'number' | 'date';
   placeholder?: string;
+  colSpan?: number;
 }
 
 interface SettingsGroup {
+  id: string;
   title: string;
   description?: string;
+  icon: any;
   settings: Setting[];
 }
 
 const settingsGroups: SettingsGroup[] = [
   {
+    id: 'event',
     title: 'Informações do Evento',
-    description: 'Configure as datas do carnaval',
+    description: 'Configure as datas principais do carnaval',
+    icon: Calendar,
     settings: [
       { key: 'carnival_start_date', value: '', label: 'Data de Início', type: 'date' },
       { key: 'carnival_end_date', value: '', label: 'Data de Término', type: 'date' },
     ]
   },
   {
+    id: 'location',
     title: 'Localização',
-    description: 'Cidade e estado do evento',
+    description: 'Cidade e estado onde ocorre o evento',
+    icon: MapPin,
     settings: [
       { key: 'city_name', value: '', label: 'Cidade', type: 'text', placeholder: 'Paracuru' },
       { key: 'state', value: '', label: 'Estado', type: 'text', placeholder: 'Ceará' },
     ]
   },
   {
+    id: 'premium',
     title: 'Acesso Premium',
-    description: 'Configurações de monetização',
+    description: 'Configurações de monetização e preços',
+    icon: Crown,
     settings: [
       { key: 'premium_price', value: '', label: 'Preço Premium (R$)', type: 'number', placeholder: '1.99' },
       { key: 'premium_duration_days', value: '', label: 'Duração Premium (dias)', type: 'number', placeholder: '7' },
     ]
   },
   {
+    id: 'appearance',
     title: 'Aparência',
     description: 'Personalização visual do app',
+    icon: Palette,
     settings: [
-      { key: 'hero_background_image', value: '', label: 'Imagem de Fundo da Hero (URL)', type: 'text', placeholder: 'https://...' },
+      { key: 'hero_background_image', value: '', label: 'Imagem de Fundo da Hero (URL)', type: 'text', placeholder: 'https://...', colSpan: 2 },
+      // Future: Color scheme, Logo URL, etc.
     ]
   },
   {
+    id: 'support',
     title: 'Suporte',
-    description: 'Contato para suporte',
+    description: 'Canais de atendimento ao usuário',
+    icon: MessageCircle,
     settings: [
-      { key: 'support_whatsapp', value: '', label: 'WhatsApp Suporte (com DDD)', type: 'text', placeholder: '85994293148' },
+      { key: 'support_whatsapp', value: '', label: 'WhatsApp Suporte (com DDD)', type: 'text', placeholder: '85994293148', colSpan: 2 },
     ]
   }
 ];
@@ -130,77 +144,104 @@ export default function ConfiguracoesPage() {
 
   return (
     <div className="admin-container">
-      <div className="admin-header flex items-center justify-between">
+      {/* Standard Header (matching other pages) */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="font-display text-2xl text-surface-900">Configurações</h1>
           <p className="text-surface-500 text-sm mt-1">
-            Configure os parâmetros do aplicativo
+            Gerencie os parâmetros globais do sistema
           </p>
         </div>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="btn-primary flex items-center gap-2"
+          className="btn-primary flex items-center justify-center gap-2 w-full md:w-auto shadow-lg shadow-fire-500/20"
         >
           {saving ? (
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
           ) : (
             <Save size={18} />
           )}
-          Salvar
+          Salvar Alterações
         </button>
       </div>
 
-      <div className="p-6">
-        <div className="admin-card max-w-3xl">
-          <div className="space-y-8">
-            {settingsGroups.map((group, groupIndex) => (
-              <div key={groupIndex}>
-                <div className="mb-4">
-                  <h2 className="font-display text-lg text-surface-900">{group.title}</h2>
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {settingsGroups.map((group) => {
+          const Icon = group.icon;
+          return (
+            <div
+              key={group.id}
+              className={`admin-card h-full flex flex-col ${group.id === 'appearance' ? 'xl:col-span-2' : ''}`}
+            >
+              <div className="flex items-start gap-4 mb-6 border-b border-surface-100 pb-4 min-h-[120px]">
+                <div className="p-3 rounded-xl bg-surface-50 text-surface-600 shrink-0">
+                  <Icon size={24} />
+                </div>
+                <div className="flex flex-col justify-center">
+                  <h2 className="font-display text-lg text-surface-900 leading-tight">{group.title}</h2>
                   {group.description && (
-                    <p className="text-sm text-surface-500 mt-1">{group.description}</p>
+                    <p className="text-sm text-surface-500 mt-1 line-clamp-2">{group.description}</p>
                   )}
                 </div>
-                <div className="space-y-4 pl-4 border-l-2 border-surface-200">
-                  {group.settings.map((setting) => (
-                    <div key={setting.key}>
-                      <label className="block text-sm font-semibold text-surface-700 mb-2">
+              </div>
+
+              <div className={`grid grid-cols-1 ${group.settings.length > 1 ? 'md:grid-cols-2' : ''} gap-x-4 gap-y-6 flex-1 content-start`}>
+                {group.settings.map((setting) => (
+                  <div key={setting.key} className={setting.colSpan ? `col-span-${setting.colSpan}` : ''}>
+                    {/* Label with forced min-height for alignment */}
+                    <div className="min-h-[32px] mb-2 flex items-end">
+                      <label className="block text-xs font-bold text-surface-500 uppercase tracking-wider">
                         {setting.label}
                       </label>
+                    </div>
 
-                      {setting.key === 'hero_background_image' ? (
-                        <div className="space-y-3">
-                          {/* Preview da imagem atual */}
-                          {values[setting.key] && (
-                            <div className="relative w-full h-32 rounded-lg overflow-hidden border border-surface-200">
+                    {setting.key === 'hero_background_image' ? (
+                      <div className="space-y-4 bg-surface-50 p-4 rounded-xl border border-surface-200">
+                        {/* Preview Area */}
+                        <div className="relative w-full h-48 rounded-lg overflow-hidden bg-surface-200 shadow-inner group">
+                          {(previewUrl || values[setting.key]) ? (
+                            <>
                               <Image
-                                src={values[setting.key]}
+                                src={previewUrl || values[setting.key]}
                                 alt="Hero preview"
                                 fill
-                                className="object-cover"
+                                className="object-cover transition-transform duration-700 group-hover:scale-105"
                               />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                            </>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center h-full text-surface-400 gap-2">
+                              <ImageIcon size={32} />
+                              <span className="text-sm">Sem imagem definida</span>
                             </div>
                           )}
+                        </div>
 
-                          {/* Input de URL */}
-                          <input
-                            type="text"
-                            value={values[setting.key] || ''}
-                            onChange={(e) =>
-                              setValues({ ...values, [setting.key]: e.target.value })
-                            }
-                            placeholder={setting.placeholder}
-                            className="input"
-                          />
+                        {/* Controls */}
+                        <div className="flex flex-col gap-3">
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={values[setting.key] || ''}
+                              onChange={(e) =>
+                                setValues({ ...values, [setting.key]: e.target.value })
+                              }
+                              placeholder={setting.placeholder}
+                              className="input text-sm font-mono"
+                            />
+                          </div>
 
-                          <div className="text-center text-sm text-surface-500 font-medium">OU</div>
+                          <div className="flex items-center gap-3">
+                            <div className="h-px bg-surface-200 flex-1" />
+                            <span className="text-xs text-surface-400 font-medium">OU</span>
+                            <div className="h-px bg-surface-200 flex-1" />
+                          </div>
 
-                          {/* Upload de arquivo */}
-                          <div className="space-y-2">
+                          <div className="flex gap-2">
                             <input
                               type="file"
-                              accept="image/jpeg,image/png,image/webp"
+                              accept="image/*"
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
                                 if (file) {
@@ -209,68 +250,45 @@ export default function ConfiguracoesPage() {
                                 }
                               }}
                               className="hidden"
-                              id="hero-image-upload"
+                              id="hero-upload"
                             />
+                            <label
+                              htmlFor="hero-upload"
+                              className="flex-1 btn-secondary text-sm py-2 cursor-pointer text-center"
+                            >
+                              {selectedFile ? selectedFile.name : 'Escolher Arquivo'}
+                            </label>
 
-                            {previewUrl && (
-                              <div className="relative w-full h-32 rounded-lg overflow-hidden border-2 border-carnival-500">
-                                <Image src={previewUrl} alt="Preview" fill className="object-cover" />
-                              </div>
-                            )}
-
-                            <div className="flex gap-2">
-                              <label
-                                htmlFor="hero-image-upload"
-                                className="flex-1 py-2 px-4 rounded-lg bg-surface-100 text-surface-700 font-semibold text-sm hover:bg-surface-200 transition-colors cursor-pointer text-center border border-surface-200"
+                            {selectedFile && (
+                              <button
+                                onClick={handleImageUpload}
+                                disabled={uploadingImage}
+                                className="btn-primary py-2 px-4"
                               >
-                                📁 Escolher Arquivo
-                              </label>
-
-                              {selectedFile && (
-                                <button
-                                  onClick={handleImageUpload}
-                                  disabled={uploadingImage}
-                                  className="flex-1 btn-primary flex items-center justify-center gap-2"
-                                >
-                                  {uploadingImage ? (
-                                    <>
-                                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                      Enviando...
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Upload size={16} />
-                                      Upload
-                                    </>
-                                  )}
-                                </button>
-                              )}
-                            </div>
-
-                            <p className="text-xs text-surface-500">
-                              Formatos: JPG, PNG, WebP (máx 5MB)
-                            </p>
+                                {uploadingImage ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Upload size={16} />}
+                              </button>
+                            )}
                           </div>
                         </div>
-                      ) : (
-                        <input
-                          type={setting.type}
-                          value={values[setting.key] || ''}
-                          onChange={(e) =>
-                            setValues({ ...values, [setting.key]: e.target.value })
-                          }
-                          placeholder={setting.placeholder}
-                          className="input"
-                          step={setting.type === 'number' ? '0.01' : undefined}
-                        />
-                      )}
-                    </div>
-                  ))}
-                </div>
+                      </div>
+                    ) : (
+                      <input
+                        type={setting.type}
+                        value={values[setting.key] || ''}
+                        onChange={(e) =>
+                          setValues({ ...values, [setting.key]: e.target.value })
+                        }
+                        placeholder={setting.placeholder}
+                        className="input"
+                        step={setting.type === 'number' ? '0.01' : undefined}
+                      />
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

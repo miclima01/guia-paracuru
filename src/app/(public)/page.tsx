@@ -81,7 +81,7 @@ export default function HomePage() {
     <div className="min-h-screen">
       {/* Hero */}
       <section className="px-4 pt-4 pb-2 max-w-2xl mx-auto">
-        <div className="relative overflow-hidden rounded-xl shadow-xl carnival-gradient-dark">
+        <div className="relative overflow-hidden rounded-xl shadow-xl bg-fire-700">
           {heroImage && (
             <div className="absolute inset-0 z-0">
               <Image
@@ -93,10 +93,10 @@ export default function HomePage() {
                 priority
                 onError={() => setHeroImage(null)}
               />
-              <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
+              <div className="absolute inset-0 bg-fire-900/70 backdrop-blur-[1px]" />
             </div>
           )}
-          <div className={`relative noise ${!heroImage ? 'carnival-gradient-dark' : ''}`}>
+          <div className={`relative noise ${!heroImage ? 'bg-fire-700' : ''}`}>
             <div className="relative z-10 px-5 pt-12 pb-8 text-center">
               {/* Logo */}
               <div className="mb-2 flex justify-center">
@@ -265,9 +265,11 @@ export default function HomePage() {
               <div className="w-10 h-10 rounded-xl bg-amber-400 flex items-center justify-center shadow-sm">
                 <Car size={20} className="text-white" />
               </div>
-              <div className="bg-amber-100 text-amber-700 p-1 rounded-md">
-                <Shield size={12} fill="currentColor" className="text-amber-500" />
-              </div>
+              {!isPremium && (
+                <div className="bg-amber-100 text-amber-700 p-1 rounded-md">
+                  <Lock size={12} className="text-amber-500" />
+                </div>
+              )}
             </div>
 
             <div className="w-full">
@@ -284,9 +286,11 @@ export default function HomePage() {
               <div className="w-10 h-10 rounded-xl bg-green-500 flex items-center justify-center shadow-sm">
                 <Car size={20} className="text-white" />
               </div>
-              <div className="bg-amber-100 text-amber-700 p-1 rounded-md">
-                <Shield size={12} fill="currentColor" className="text-amber-500" />
-              </div>
+              {!isPremium && (
+                <div className="bg-amber-100 text-amber-700 p-1 rounded-md">
+                  <Lock size={12} className="text-amber-500" />
+                </div>
+              )}
             </div>
 
             <div className="w-full">

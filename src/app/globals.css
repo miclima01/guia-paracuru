@@ -122,11 +122,11 @@
   }
 
   .admin-container {
-    @apply max-w-6xl mx-auto px-6 py-8;
+    @apply w-full max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8;
   }
 
   .admin-card {
-    @apply bg-white rounded-2xl shadow-sm border border-surface-100 p-6;
+    @apply bg-white rounded-2xl shadow-sm border border-surface-200 p-6;
   }
 }
 

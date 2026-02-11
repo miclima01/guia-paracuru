@@ -46,14 +46,17 @@ export default function AdminDashboard() {
           {cards.map((card) => {
             const Icon = card.icon;
             return (
-              <div key={card.label} className="bg-white rounded-2xl shadow-sm border border-surface-100 p-6">
+              <div
+                key={card.label}
+                className="group bg-white rounded-2xl shadow-sm border border-surface-200 p-6 hover:shadow-md transition-all duration-300 hover:border-surface-300"
+              >
                 <div className="flex items-center justify-between mb-4">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${card.color} flex items-center justify-center`}>
-                    <Icon size={24} className="text-white" />
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${card.color} flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform duration-300`}>
+                    <Icon size={24} />
                   </div>
                 </div>
-                <p className="text-3xl font-display text-surface-900">{card.value}</p>
-                <p className="text-sm text-surface-500 mt-1">{card.label}</p>
+                <p className="text-3xl font-display text-surface-900 tracking-tight">{card.value}</p>
+                <p className="text-sm font-medium text-surface-500 mt-1">{card.label}</p>
               </div>
             );
           })}

@@ -143,28 +143,28 @@ export default function ContatosPage() {
               return (
                 <div
                   key={contact.id}
-                  className="bg-white p-4 rounded-xl border border-surface-100 shadow-sm flex items-center justify-between transition-all hover:border-surface-200"
+                  className="bg-white p-6 rounded-xl border border-surface-100 shadow-sm flex items-center justify-between transition-all hover:border-surface-200"
                 >
                   <div>
-                    <p className="font-bold text-sm text-surface-900">{contact.name}</p>
-                    <p className="text-xs text-ocean-600 font-semibold mt-0.5">{formatPhone(contact.phone)}</p>
+                    <p className="font-bold text-lg text-surface-900">{contact.name}</p>
+                    <p className="text-base text-ocean-600 font-semibold mt-1">{formatPhone(contact.phone)}</p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <a
                       href={whatsappLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-green-600 hover:bg-green-100 transition-colors"
+                      className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-green-600 hover:bg-green-100 transition-colors shadow-sm active:scale-95"
                       aria-label="WhatsApp"
                     >
-                      <MessageCircle size={14} />
+                      <MessageCircle size={24} />
                     </a>
                     <a
                       href={`tel:${contact.phone}`}
-                      className="w-8 h-8 rounded-full bg-ocean-50 flex items-center justify-center text-ocean-600 hover:bg-ocean-100 transition-colors"
+                      className="w-12 h-12 rounded-full bg-ocean-50 flex items-center justify-center text-ocean-600 hover:bg-ocean-100 transition-colors shadow-sm active:scale-95"
                       aria-label="Ligar"
                     >
-                      <Phone size={14} />
+                      <Phone size={24} />
                     </a>
                   </div>
                 </div>
