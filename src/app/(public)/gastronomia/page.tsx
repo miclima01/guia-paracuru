@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import Image from 'next/image';
-import { Beer, MapPin, Search, Store } from 'lucide-react';
+import { Beer, MapPin, Search, Store, Star } from 'lucide-react';
 import type { Business, BusinessCategory } from '@/types';
 import { CATEGORY_LABELS } from '@/lib/utils';
 import EstablishmentModal from '@/components/public/EstablishmentModal';
@@ -137,6 +137,18 @@ export default function GastronomiaPage() {
                                 </div>
                                 <div className="p-4">
                                     <h3 className="font-bold text-lg text-surface-900">{biz.name}</h3>
+                                    {biz.rating && biz.rating > 0 && (
+                                        <div className="flex items-center gap-0.5 mb-1">
+                                            {Array.from({ length: 5 }).map((_, i) => (
+                                                <Star
+                                                    key={i}
+                                                    size={14}
+                                                    className={`${i < Math.round(biz.rating || 0) ? 'text-amber-400 fill-amber-400' : 'text-surface-200'}`}
+                                                />
+                                            ))}
+                                            <span className="text-xs text-surface-500 font-medium ml-1">({biz.rating})</span>
+                                        </div>
+                                    )}
                                     <p className="text-sm text-surface-500 mt-1 line-clamp-2">{biz.description}</p>
 
                                     <div className="mt-4 space-y-2">

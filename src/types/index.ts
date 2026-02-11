@@ -46,6 +46,7 @@ export interface Business {
   is_partner: boolean;
   is_premium: boolean;
   is_featured: boolean;
+  rating?: number;
   order_index: number;
   created_at: string;
   updated_at: string;

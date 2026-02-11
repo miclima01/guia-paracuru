@@ -216,6 +216,18 @@ export default function HomePage() {
                 </div>
                 <div className="h-[40%] p-4 flex flex-col justify-center bg-white text-left">
                   <p className="font-bold text-sm text-surface-900 leading-tight mb-1 line-clamp-2">{biz.name}</p>
+                  {biz.rating && biz.rating > 0 && (
+                    <div className="flex items-center gap-0.5 mb-1">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          size={12}
+                          className={`${i < Math.round(biz.rating || 0) ? 'text-amber-400 fill-amber-400' : 'text-surface-200'}`}
+                        />
+                      ))}
+                      <span className="text-[10px] text-surface-500 font-medium ml-1">({biz.rating})</span>
+                    </div>
+                  )}
                   <p className="text-xs text-surface-500 line-clamp-2 leading-relaxed">{biz.description || CATEGORY_LABELS[biz.category as BusinessCategory]}</p>
                 </div>
               </button>
@@ -315,7 +327,7 @@ export default function HomePage() {
             <div className="absolute inset-0 carnival-gradient-dark" />
             <div className="absolute inset-0 premium-shimmer" />
             <div className="relative z-10">
-              <h3 className="font-display text-lg text-white mt-2">Acesso Premium</h3>
+              <h3 className="font-display text-lg font-semibold text-white mt-2">Acesso Premium</h3>
               <p className="text-sm text-white/70 mt-1">
                 Desbloqueie toda a programação, contatos de transporte e mais por apenas R$ 1,99.
               </p>
@@ -340,7 +352,7 @@ export default function HomePage() {
           <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
 
           <div className="relative z-10">
-            <h3 className="font-display text-lg text-white mt-2">
+            <h3 className="font-display text-lg font-semibold text-white mt-2">
               Coloque sua marca na frente de milhares de foliões
             </h3>
 

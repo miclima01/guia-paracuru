@@ -69,7 +69,7 @@ export default function ContatosPage() {
                 <Store size={20} className="text-white" />
               </div>
               <div>
-                <p className="font-bold text-sm text-surface-900 leading-tight">Hospital / Pronto Socorro</p>
+                <p className="font-semibold text-sm text-surface-900 leading-tight">Hospital / Pronto Socorro</p>
                 <p className="text-xs text-fire-600 font-bold mt-1 flex items-center gap-1">
                   <Phone size={10} /> 192
                 </p>
@@ -82,7 +82,7 @@ export default function ContatosPage() {
                 <Shield size={20} className="text-white" />
               </div>
               <div>
-                <p className="font-bold text-sm text-surface-900 leading-tight">RAIO / Polícia</p>
+                <p className="font-semibold text-sm text-surface-900 leading-tight">RAIO / Polícia</p>
                 <p className="text-xs text-fire-600 font-bold mt-1 flex items-center gap-1">
                   <Phone size={10} /> 190
                 </p>
@@ -97,7 +97,7 @@ export default function ContatosPage() {
               >
                 <span className="text-xl">{EMERGENCY_ICONS[contact.category] || '📞'}</span>
                 <div className="min-w-0">
-                  <p className="font-bold text-xs text-surface-900 truncate">{contact.name}</p>
+                  <p className="font-semibold text-xs text-surface-900 truncate">{contact.name}</p>
                   <p className="text-xs text-fire-600 font-semibold">{contact.phone}</p>
                 </div>
               </a>
@@ -144,7 +144,7 @@ export default function ContatosPage() {
                   className="bg-white p-4 rounded-xl border border-surface-100 shadow-sm flex items-center justify-between transition-all hover:border-surface-200"
                 >
                   <div>
-                    <p className="font-bold text-base text-surface-900">{contact.name}</p>
+                    <p className="font-semibold text-base text-surface-900">{contact.name}</p>
                     <p className="text-sm text-ocean-600 font-semibold mt-0.5">{formatPhone(contact.phone)}</p>
                   </div>
                   <div className="flex gap-2">
@@ -189,7 +189,7 @@ export default function ContatosPage() {
           <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
 
           <div className="relative z-10">
-            <h3 className="font-display text-lg text-white mt-2">
+            <h3 className="font-display text-lg font-semibold text-white mt-2">
               Quer seu número aqui?
             </h3>
 

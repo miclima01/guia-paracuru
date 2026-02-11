@@ -172,6 +172,22 @@ export default function EstablishmentModal({
                                 placeholder="(85) 99999-9999"
                             />
                         </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-surface-700 mb-1">
+                                Nota (0-5)
+                            </label>
+                            <input
+                                type="number"
+                                min="0"
+                                max="5"
+                                step="0.1"
+                                value={formData.rating || ''}
+                                onChange={(e) => handleChange('rating', parseFloat(e.target.value))}
+                                className="w-full px-4 py-2 rounded-lg border border-surface-200 focus:border-carnival-500 focus:ring-2 focus:ring-carnival-200 outline-none transition-all"
+                                placeholder="Ex: 4.8"
+                            />
+                        </div>
                     </div>
 
                     {/* Description */}

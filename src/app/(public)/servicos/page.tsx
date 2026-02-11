@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { ShoppingBag, MapPin, Phone, Search, Store } from 'lucide-react';
+import { ShoppingBag, MapPin, Phone, Search, Store, Star } from 'lucide-react';
 import type { Business, BusinessCategory } from '@/types';
 import { CATEGORY_LABELS } from '@/lib/utils';
 
@@ -86,8 +86,8 @@ export default function ServicesPage() {
                                 key={cat.id}
                                 onClick={() => setSelectedCategory(cat.id)}
                                 className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${selectedCategory === cat.id
-                                        ? 'bg-emerald-500 text-white'
-                                        : 'bg-surface-100 text-surface-600 hover:bg-surface-200'
+                                    ? 'bg-emerald-500 text-white'
+                                    : 'bg-surface-100 text-surface-600 hover:bg-surface-200'
                                     }`}
                             >
                                 {cat.label}
@@ -119,6 +119,18 @@ export default function ServicesPage() {
                                 <div className="flex items-start justify-between">
                                     <div>
                                         <h3 className="font-bold text-surface-900 truncate pr-2">{biz.name}</h3>
+                                        {biz.rating && biz.rating > 0 && (
+                                            <div className="flex items-center gap-0.5 mb-1">
+                                                {Array.from({ length: 5 }).map((_, i) => (
+                                                    <Star
+                                                        key={i}
+                                                        size={10}
+                                                        className={`${i < Math.round(biz.rating || 0) ? 'text-amber-400 fill-amber-400' : 'text-surface-200'}`}
+                                                    />
+                                                ))}
+                                                <span className="text-[10px] text-surface-500 font-medium ml-1">({biz.rating})</span>
+                                            </div>
+                                        )}
                                         <div className="flex items-center gap-1 text-[10px] text-surface-500 mb-1">
                                             <span className="px-1.5 py-0.5 rounded bg-surface-100 text-surface-600 font-medium">
                                                 {CATEGORY_LABELS[biz.category as BusinessCategory]}
