@@ -2,21 +2,44 @@ import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 const ADMIN_TOKEN_KEY = 'admin_token';
-const SECRET_KEY = process.env.ADMIN_SECRET_KEY || 'change_me_in_production';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@guiaparacuru.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || process.env.ADMIN_SECRET_KEY || 'change_me_in_production';
 
 // Simple token generation (in production, use JWT)
 function generateToken(secret: string): string {
   return Buffer.from(`${secret}:${Date.now()}`).toString('base64');
 }
 
-// Validate admin password
-export function validateAdminPassword(password: string): boolean {
-  return password === SECRET_KEY;
+// Validate email format
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+// Validate admin credentials
+export function validateAdminCredentials(email: string, password: string): { valid: boolean; error?: string } {
+  if (!email || !password) {
+    return { valid: false, error: 'E-mail e senha são obrigatórios' };
+  }
+
+  if (!isValidEmail(email)) {
+    return { valid: false, error: 'Formato de e-mail inválido' };
+  }
+
+  if (email !== ADMIN_EMAIL) {
+    return { valid: false, error: 'E-mail incorreto' };
+  }
+
+  if (password !== ADMIN_PASSWORD) {
+    return { valid: false, error: 'Senha incorreta' };
+  }
+
+  return { valid: true };
 }
 
 // Create admin session
 export async function createAdminSession(): Promise<string> {
-  const token = generateToken(SECRET_KEY);
+  const token = generateToken(ADMIN_PASSWORD);
 
   // Set cookie
   (await cookies()).set(ADMIN_TOKEN_KEY, token, {

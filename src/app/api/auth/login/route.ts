@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateAdminPassword, createAdminSession } from '@/lib/admin-auth';
+import { validateAdminCredentials, createAdminSession } from '@/lib/admin-auth';
 
 export async function POST(request: NextRequest) {
   try {
-    const { password } = await request.json();
+    const { email, password } = await request.json();
 
-    if (!password) {
-      return NextResponse.json({ error: 'Senha obrigatória' }, { status: 400 });
+    if (!email || !password) {
+      return NextResponse.json({ error: 'E-mail e senha são obrigatórios' }, { status: 400 });
     }
 
-    if (!validateAdminPassword(password)) {
-      return NextResponse.json({ error: 'Senha incorreta' }, { status: 401 });
+    const validation = validateAdminCredentials(email, password);
+
+    if (!validation.valid) {
+      return NextResponse.json({ error: validation.error }, { status: 401 });
     }
 
     await createAdminSession();

@@ -227,7 +227,7 @@ INSERT INTO app_settings (key, value) VALUES
   ('carnival_end_date', '2026-02-17'),
   ('city_name', 'Paracuru'),
   ('state', 'Ceará'),
-  ('premium_price', '9.90'),
+  ('premium_price', '1.99'),
   ('premium_duration_days', '7'),
   ('hero_image', ''),
   ('about_text', 'Bem-vindo ao Guia Paracuru! Seu guia completo para o Carnaval de Paracuru 2026.');
