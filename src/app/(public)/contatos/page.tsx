@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Phone, Shield, Store, Car, Ticket, MessageCircle } from 'lucide-react';
+import { Phone, Shield, Store, Car, Ticket, MessageCircle, ArrowRight } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { EMERGENCY_ICONS, formatPhone } from '@/lib/utils';
 import type { EmergencyContact, TransportContact } from '@/types';
@@ -58,8 +58,7 @@ export default function ContatosPage() {
       <div className="px-4 mt-8 max-w-2xl mx-auto space-y-8">
         {/* Emergency Section */}
         <section>
-          <div className="flex items-center gap-2 mb-4 text-surface-900">
-            <Shield className="text-fire-500" size={20} />
+          <div className="mb-4 text-surface-900">
             <h2 className="font-display text-lg">Contatos de Emergência</h2>
           </div>
 
@@ -108,8 +107,7 @@ export default function ContatosPage() {
 
         {/* Transport Section */}
         <section>
-          <div className="flex items-center gap-2 mb-4 text-surface-900">
-            <Car className="text-ocean-500" size={20} />
+          <div className="mb-4 text-surface-900">
             <h2 className="font-display text-lg">Táxi & Mototáxi</h2>
           </div>
 
@@ -143,28 +141,28 @@ export default function ContatosPage() {
               return (
                 <div
                   key={contact.id}
-                  className="bg-white p-6 rounded-xl border border-surface-100 shadow-sm flex items-center justify-between transition-all hover:border-surface-200"
+                  className="bg-white p-4 rounded-xl border border-surface-100 shadow-sm flex items-center justify-between transition-all hover:border-surface-200"
                 >
                   <div>
-                    <p className="font-bold text-lg text-surface-900">{contact.name}</p>
-                    <p className="text-base text-ocean-600 font-semibold mt-1">{formatPhone(contact.phone)}</p>
+                    <p className="font-bold text-base text-surface-900">{contact.name}</p>
+                    <p className="text-sm text-ocean-600 font-semibold mt-0.5">{formatPhone(contact.phone)}</p>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     <a
                       href={whatsappLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-green-600 hover:bg-green-100 transition-colors shadow-sm active:scale-95"
+                      className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600 hover:bg-green-100 transition-colors shadow-sm active:scale-95"
                       aria-label="WhatsApp"
                     >
-                      <MessageCircle size={24} />
+                      <MessageCircle size={20} />
                     </a>
                     <a
                       href={`tel:${contact.phone}`}
-                      className="w-12 h-12 rounded-full bg-ocean-50 flex items-center justify-center text-ocean-600 hover:bg-ocean-100 transition-colors shadow-sm active:scale-95"
+                      className="w-10 h-10 rounded-full bg-ocean-50 flex items-center justify-center text-ocean-600 hover:bg-ocean-100 transition-colors shadow-sm active:scale-95"
                       aria-label="Ligar"
                     >
-                      <Phone size={24} />
+                      <Phone size={20} />
                     </a>
                   </div>
                 </div>
@@ -179,18 +177,31 @@ export default function ContatosPage() {
           </div>
         </section>
 
-        {/* Premium Banner */}
-        <div className="p-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg relative overflow-hidden">
-          <div className="relative z-10 flex items-center justify-between">
-            <div>
-              <p className="font-bold text-sm opacity-90 mb-1">Quer seu número aqui?</p>
-              <p className="text-xs opacity-75 max-w-[200px]">Destaque seu serviço de transporte para milhares de foliões.</p>
-            </div>
-            <Link href={`https://wa.me/55${supportWhatsapp || '85994293148'}`} target="_blank" className="bg-white text-purple-600 px-4 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-purple-50 transition-colors">
-              Anunciar
-            </Link>
+        {/* Commercial Opportunity Banner */}
+        <a
+          href={`https://wa.me/55${(supportWhatsapp || '85994293148').replace(/\D/g, '')}?text=Olá! Gostaria de anunciar no Guia do Carnaval.`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block w-full relative overflow-hidden rounded-xl p-6 text-left shadow-lg active:scale-[0.98] transition-all group"
+        >
+          {/* Background - Green Gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 to-green-500" />
+          <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
+
+          <div className="relative z-10">
+            <h3 className="font-display text-lg text-white mt-2">
+              Quer seu número aqui?
+            </h3>
+
+            <p className="text-sm text-white/70 mt-1 mb-4 max-w-[90%]">
+              Destaque seu serviço de transporte para milhares de foliões.
+            </p>
+
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-emerald-600 text-sm font-bold shadow-sm group-hover:bg-surface-50 transition-colors">
+              Anunciar agora <ArrowRight size={14} />
+            </span>
           </div>
-        </div>
+        </a>
       </div>
     </div>
   );
