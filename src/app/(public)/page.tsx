@@ -81,7 +81,7 @@ export default function HomePage() {
     <div className="min-h-screen">
       {/* Hero */}
       <section className="px-4 pt-4 pb-2 max-w-2xl mx-auto">
-        <div className="relative overflow-hidden rounded-xl shadow-xl bg-fire-700">
+        <div className="relative overflow-hidden rounded-xl shadow-xl bg-gradient-to-br from-fire-800 to-fire-600">
           {heroImage && (
             <div className="absolute inset-0 z-0">
               <Image
@@ -96,7 +96,7 @@ export default function HomePage() {
               <div className="absolute inset-0 bg-fire-900/70 backdrop-blur-[1px]" />
             </div>
           )}
-          <div className={`relative noise ${!heroImage ? 'bg-fire-700' : ''}`}>
+          <div className={`relative noise ${!heroImage ? 'bg-transparent' : ''}`}>
             <div className="relative z-10 px-5 pt-12 pb-8 text-center">
               {/* Logo */}
               <div className="mb-2 flex justify-center">
@@ -326,6 +326,34 @@ export default function HomePage() {
           </button>
         </section>
       )}
+
+      {/* Commercial Opportunity Banner */}
+      <section className="px-4 mb-8 max-w-2xl mx-auto">
+        <a
+          href={`https://wa.me/55${supportWhatsapp.replace(/\D/g, '')}?text=Olá! Gostaria de anunciar no Guia do Carnaval.`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block w-full relative overflow-hidden rounded-xl p-6 text-left shadow-lg active:scale-[0.98] transition-all group"
+        >
+          {/* Background - Green Gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 to-green-500" />
+          <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
+
+          <div className="relative z-10">
+            <h3 className="font-display text-lg text-white mt-2">
+              Coloque sua marca na frente de milhares de foliões
+            </h3>
+
+            <p className="text-sm text-white/70 mt-1 mb-4 max-w-[90%]">
+              Divulgue no guia oficial do Carnaval e destaque seu negócio.
+            </p>
+
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-emerald-600 text-sm font-bold shadow-sm group-hover:bg-surface-50 transition-colors">
+              Anunciar agora <ArrowRight size={14} />
+            </span>
+          </div>
+        </a>
+      </section>
 
       <EstablishmentModal
         business={selectedBusiness}
