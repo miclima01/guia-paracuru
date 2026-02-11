@@ -43,6 +43,8 @@ export const CATEGORY_LABELS: Record<BusinessCategory, string> = {
   pharmacy: 'Farmácia',
   market: 'Mercado',
   gas_station: 'Posto de Gasolina',
+  hospital: 'Hospital',
+  health_post: 'Posto de Saúde',
   other: 'Outro',
 };
 

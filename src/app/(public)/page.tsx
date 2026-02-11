@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CATEGORY_LABELS } from '@/lib/utils';
+import { formatCarnivalDateRange, formatLocation } from '@/lib/format-dates';
 import { useAppStore } from '@/hooks/useStore';
 import NewsSlider from '@/components/public/NewsSlider';
 import EstablishmentModal from '@/components/public/EstablishmentModal';
@@ -24,13 +25,16 @@ export default function HomePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [heroImage, setHeroImage] = useState<string | null>(null);
+  const [supportWhatsapp, setSupportWhatsapp] = useState('');
+  const [carnivalDates, setCarnivalDates] = useState('13 a 17 de Fevereiro, 2026');
+  const [location, setLocation] = useState('Paracuru, Ceará - Brasil');
   const { isPremium, openPaymentModal } = useAppStore();
 
   useEffect(() => {
     // Fetch main content
     Promise.all([
       supabase.from('news').select('id,title,summary,image_url,category,published_at').order('published_at', { ascending: false }).limit(3),
-      supabase.from('businesses').select('id,name,description,category,image_url,is_partner,is_featured').eq('is_featured', true).order('order_index').limit(4),
+      supabase.from('businesses').select('*').eq('is_featured', true).order('order_index').limit(4),
     ]).then(([newsRes, bizRes]) => {
       if (newsRes.data) setNews(newsRes.data as NewsArticle[]);
       if (bizRes.data) setFeatured(bizRes.data as Business[]);
@@ -39,14 +43,32 @@ export default function HomePage() {
     // Fetch settings independently to avoid blocking main content
     (async () => {
       try {
-        const { data } = await supabase.from('app_settings').select('value').eq('key', 'hero_background_image').single();
-        if (data) setHeroImage(data.value);
+        const [heroRes, whatsappRes, startDateRes, endDateRes, cityRes, stateRes] = await Promise.all([
+          supabase.from('app_settings').select('value').eq('key', 'hero_background_image').single(),
+          supabase.from('app_settings').select('value').eq('key', 'support_whatsapp').single(),
+          supabase.from('app_settings').select('value').eq('key', 'carnival_start_date').single(),
+          supabase.from('app_settings').select('value').eq('key', 'carnival_end_date').single(),
+          supabase.from('app_settings').select('value').eq('key', 'city_name').single(),
+          supabase.from('app_settings').select('value').eq('key', 'state').single(),
+        ]);
+
+        if (heroRes.data) setHeroImage(heroRes.data.value);
+        if (whatsappRes.data?.value) setSupportWhatsapp(whatsappRes.data.value);
+
+        if (startDateRes.data?.value && endDateRes.data?.value) {
+          setCarnivalDates(formatCarnivalDateRange(startDateRes.data.value, endDateRes.data.value));
+        }
+
+        if (cityRes.data?.value && stateRes.data?.value) {
+          setLocation(formatLocation(cityRes.data.value, stateRes.data.value));
+        }
       } catch (err) {
         console.error('Error fetching settings:', err);
       }
     })();
   }, []);
 
+  const freeRoutes = ['/noticias', '/programacao', '/mapa', '/gastronomia', '/servicos', '/contatos'];
   const quickLinks = [
     { href: '/mapa', icon: MapPin, label: 'Mapa Interativo', desc: 'Todos os locais', color: 'from-sky-400 to-blue-600' },
     { href: '/gastronomia', icon: Beer, label: 'Bares & Restaurantes', desc: 'Onde comer e beber', color: 'from-orange-400 to-orange-600' },
@@ -76,39 +98,34 @@ export default function HomePage() {
           )}
           <div className={`relative noise ${!heroImage ? 'carnival-gradient-dark' : ''}`}>
             <div className="relative z-10 px-5 pt-12 pb-8 text-center">
-              {/* Logo area */}
-              <div className="mb-2">
-                <h1 className="font-display text-4xl text-white tracking-tight leading-none drop-shadow-lg">
-                  PARACURU
-                </h1>
-                <p className="font-display text-lg text-carnival-200 tracking-widest drop-shadow-md">
-                  FOLIA 2026
-                </p>
+              {/* Logo */}
+              <div className="mb-2 flex justify-center">
+                <Image
+                  src="/logo.png"
+                  alt="Paracuru Folia 2026"
+                  width={280}
+                  height={280}
+                  className="drop-shadow-xl"
+                  priority
+                />
               </div>
               <div className="flex items-center justify-center gap-2 mt-4 text-sm text-white/90 font-medium drop-shadow-sm">
                 <Calendar size={14} />
-                <span>13 a 17 de Fevereiro, 2026</span>
+                <span>{carnivalDates}</span>
               </div>
               <div className="flex items-center justify-center gap-2 mt-1 text-sm text-white/70 font-medium drop-shadow-sm">
                 <MapPin size={14} />
-                <span>Paracuru, Ceará - Brasil</span>
+                <span>{location}</span>
               </div>
 
               {/* CTA */}
               <button
-                onClick={(e) => {
-                  if (!isPremium) {
-                    e.preventDefault();
-                    openPaymentModal();
-                  } else {
-                    router.push('/programacao');
-                  }
-                }}
+                onClick={() => router.push('/programacao')}
                 className="inline-flex items-center gap-2 mt-6 px-6 py-3 rounded-xl bg-white/15 backdrop-blur-sm border border-white/20 text-white font-semibold text-sm hover:bg-white/25 transition-all active:scale-95 shadow-lg"
               >
-                {!isPremium ? <Lock size={16} className="text-yellow-400" /> : <Music size={16} />}
+                <Music size={16} />
                 Ver programação completa
-                {!isPremium ? null : <ChevronRight size={16} />}
+                <ChevronRight size={16} />
               </button>
             </div>
           </div>
@@ -120,11 +137,12 @@ export default function HomePage() {
         <div className="flex overflow-x-auto gap-3 pb-4 pr-4 no-scrollbar">
           {quickLinks.map((link) => {
             const Icon = link.icon;
+            const isFree = freeRoutes.includes(link.href);
             return (
               <button
                 key={link.href}
                 onClick={() => {
-                  if (!isPremium) {
+                  if (!isFree && !isPremium) {
                     openPaymentModal();
                   } else {
                     router.push(link.href);
@@ -136,7 +154,7 @@ export default function HomePage() {
                 <div className="relative z-10">
                   <div className="flex justify-between items-start">
                     <Icon size={22} strokeWidth={2} />
-                    {!isPremium && <Lock size={16} className="text-white/80" />}
+                    {!isFree && !isPremium && <Lock size={16} className="text-white/80" />}
                   </div>
                   <p className="font-bold text-sm mt-2 leading-tight">{link.label}</p>
                   <p className="text-[10px] text-white/70 mt-0.5">{link.desc}</p>
@@ -153,29 +171,13 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-lg text-surface-900">Últimas Notícias</h2>
             <button
-              onClick={() => !isPremium ? openPaymentModal() : router.push('/noticias')}
+              onClick={() => router.push('/noticias')}
               className="text-xs text-fire-600 font-semibold flex items-center gap-1"
             >
-              {!isPremium && <Lock size={12} />}
               Ver todas <ChevronRight size={14} />
             </button>
           </div>
-          <div className="relative" onClickCapture={(e) => {
-            if (!isPremium) {
-              e.preventDefault();
-              e.stopPropagation();
-              openPaymentModal();
-            }
-          }}>
-            {!isPremium && (
-              <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/5 backdrop-blur-[1px] rounded-xl border border-white/20">
-                <div className="bg-black/60 p-2 rounded-full backdrop-blur-md">
-                  <Lock size={24} className="text-white" />
-                </div>
-              </div>
-            )}
-            <NewsSlider news={news} />
-          </div>
+          <NewsSlider news={news} supportWhatsapp={supportWhatsapp} />
         </section>
       )}
 
@@ -193,20 +195,11 @@ export default function HomePage() {
               <button
                 key={biz.id}
                 onClick={() => {
-                  if (!isPremium) {
-                    openPaymentModal();
-                  } else {
-                    setSelectedBusiness(biz);
-                    setIsModalOpen(true);
-                  }
+                  setSelectedBusiness(biz);
+                  setIsModalOpen(true);
                 }}
                 className="flex-none w-[242px] h-[242px] snap-center rounded-xl overflow-hidden bg-white shadow-sm border border-surface-100 flex flex-col hover:shadow-md transition-shadow cursor-pointer relative"
               >
-                {!isPremium && (
-                  <div className="absolute top-2 right-2 z-20 bg-black/60 p-1.5 rounded-full backdrop-blur-sm">
-                    <Lock size={14} className="text-white" />
-                  </div>
-                )}
                 <div className="h-[60%] bg-surface-100 overflow-hidden relative">
                   {biz.image_url ? (
                     <Image src={biz.image_url} alt={biz.name} className="w-full h-full object-cover" fill sizes="242px" />
@@ -235,8 +228,7 @@ export default function HomePage() {
       <section className="px-4 mt-8 mb-6 max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-display text-lg text-surface-900">Contatos de Emergência</h2>
-          <button onClick={() => !isPremium ? openPaymentModal() : router.push('/contatos')} className="text-xs text-fire-600 font-semibold flex items-center gap-1">
-            {!isPremium && <Lock size={12} />}
+          <button onClick={() => router.push('/contatos')} className="text-xs text-fire-600 font-semibold flex items-center gap-1">
             Ver todos <ChevronRight size={14} />
           </button>
         </div>
@@ -268,13 +260,13 @@ export default function HomePage() {
           </a>
 
           {/* Taxi */}
-          <button onClick={() => !isPremium ? openPaymentModal() : router.push('/contatos')} className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all relative overflow-hidden group text-left">
+          <button onClick={() => router.push('/contatos')} className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all relative overflow-hidden group text-left">
             <div className="flex items-start justify-between mb-3 w-full">
               <div className="w-10 h-10 rounded-xl bg-amber-400 flex items-center justify-center shadow-sm">
                 <Car size={20} className="text-white" />
               </div>
               <div className="bg-amber-100 text-amber-700 p-1 rounded-md">
-                {!isPremium ? <Lock size={12} className="text-amber-500" /> : <Shield size={12} fill="currentColor" className="text-amber-500" />}
+                <Shield size={12} fill="currentColor" className="text-amber-500" />
               </div>
             </div>
 
@@ -283,18 +275,17 @@ export default function HomePage() {
               <div className="flex items-center gap-1 text-xs text-fire-600 font-semibold mt-1 group-hover:underline">
                 Ver lista completa <ChevronRight size={10} />
               </div>
-              <p className="text-[10px] text-surface-400 mt-1 uppercase tracking-wide font-medium">Premium</p>
             </div>
           </button>
 
           {/* Mototaxi */}
-          <button onClick={() => !isPremium ? openPaymentModal() : router.push('/contatos')} className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all relative overflow-hidden group text-left">
+          <button onClick={() => router.push('/contatos')} className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all relative overflow-hidden group text-left">
             <div className="flex items-start justify-between mb-3 w-full">
               <div className="w-10 h-10 rounded-xl bg-green-500 flex items-center justify-center shadow-sm">
                 <Car size={20} className="text-white" />
               </div>
               <div className="bg-amber-100 text-amber-700 p-1 rounded-md">
-                {!isPremium ? <Lock size={12} className="text-amber-500" /> : <Shield size={12} fill="currentColor" className="text-amber-500" />}
+                <Shield size={12} fill="currentColor" className="text-amber-500" />
               </div>
             </div>
 
@@ -303,7 +294,6 @@ export default function HomePage() {
               <div className="flex items-center gap-1 text-xs text-fire-600 font-semibold mt-1 group-hover:underline">
                 Ver lista completa <ChevronRight size={10} />
               </div>
-              <p className="text-[10px] text-surface-400 mt-1 uppercase tracking-wide font-medium">Premium</p>
             </div>
           </button>
         </div>

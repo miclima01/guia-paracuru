@@ -2,17 +2,19 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { ChevronRight, Clock, AlertCircle, ArrowRight } from 'lucide-react';
+import { ChevronRight, Clock, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
 import { formatDateTime } from '@/lib/utils';
 import type { NewsArticle } from '@/types';
 
 interface NewsSliderProps {
     news: NewsArticle[];
+    supportWhatsapp?: string;
 }
 
-export default function NewsSlider({ news }: NewsSliderProps) {
+export default function NewsSlider({ news, supportWhatsapp }: NewsSliderProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const totalSlides = news.length + 1; // +1 for ad slide
 
     function resetTimeout() {
         if (timeoutRef.current) {
@@ -24,14 +26,14 @@ export default function NewsSlider({ news }: NewsSliderProps) {
         resetTimeout();
         timeoutRef.current = setTimeout(() => {
             setCurrentIndex((prevIndex) =>
-                prevIndex === news.length - 1 ? 0 : prevIndex + 1
+                prevIndex === totalSlides - 1 ? 0 : prevIndex + 1
             );
         }, 5000);
 
         return () => {
             resetTimeout();
         };
-    }, [currentIndex, news.length]);
+    }, [currentIndex, totalSlides]);
 
     if (!news || news.length === 0) return null;
 
@@ -97,11 +99,30 @@ export default function NewsSlider({ news }: NewsSliderProps) {
                         </div>
                     </div>
                 ))}
+
+                {/* Ad Slide */}
+                <div className="inline-block w-full align-top whitespace-normal">
+                    <div className="relative min-h-[220px] p-6 flex flex-col items-center justify-center text-white overflow-hidden text-center">
+                        <div className="absolute inset-0 bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500" />
+                        <div className="relative z-10 flex flex-col items-center">
+                            <h3 className="font-display text-xl md:text-2xl font-bold mb-2 uppercase">Anuncie Aqui!</h3>
+                            <p className="text-white/90 text-sm mb-4">Mostre sua marca para milhares de foliões</p>
+                            <a
+                                href={`https://wa.me/55${supportWhatsapp || '85994293148'}?text=Olá! Gostaria de anunciar no Guia Paracuru`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-7 py-2.5 bg-white text-orange-600 rounded-full font-bold text-[13px] hover:bg-white/90 transition-colors"
+                            >
+                                Saiba Mais
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* Dots Navigation */}
             <div className="absolute bottom-4 left-0 w-full flex justify-center gap-1.5 z-20">
-                {news.map((_, idx) => (
+                {Array.from({ length: totalSlides }).map((_, idx) => (
                     <button
                         key={idx}
                         className={`h-1.5 rounded-full transition-all duration-300 ${currentIndex === idx ? 'w-6 bg-white' : 'w-1.5 bg-white/40 hover:bg-white/60'

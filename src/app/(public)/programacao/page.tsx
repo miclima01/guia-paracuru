@@ -3,8 +3,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { Calendar, Info, MapPin, Music } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { useAppStore } from '@/hooks/useStore';
 import { formatDate } from '@/lib/utils';
+import { formatCarnivalDateRangeUppercase } from '@/lib/format-dates';
 import type { Attraction } from '@/types';
 import AttractionCard from '@/components/public/AttractionCard';
 
@@ -12,12 +12,28 @@ export default function ProgramacaoPage() {
   const [attractions, setAttractions] = useState<Attraction[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string>('');
-  const { isPremium, openPaymentModal } = useAppStore();
+  const [carnivalDates, setCarnivalDates] = useState<string>('13 A 17 DE FEVEREIRO, 2026');
   const tabsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadAttractions();
+    loadCarnivalDates();
   }, []);
+
+  async function loadCarnivalDates() {
+    try {
+      const [startRes, endRes] = await Promise.all([
+        supabase.from('app_settings').select('value').eq('key', 'carnival_start_date').single(),
+        supabase.from('app_settings').select('value').eq('key', 'carnival_end_date').single(),
+      ]);
+
+      if (startRes.data?.value && endRes.data?.value) {
+        setCarnivalDates(formatCarnivalDateRangeUppercase(startRes.data.value, endRes.data.value));
+      }
+    } catch (error) {
+      console.error('Error loading carnival dates:', error);
+    }
+  }
 
   async function loadAttractions() {
     try {
@@ -76,7 +92,7 @@ export default function ProgramacaoPage() {
 
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold mt-4 border border-white/10">
               <Calendar size={12} />
-              13 A 17 DE FEVEREIRO, 2026
+              {carnivalDates}
             </div>
           </div>
         </div>
@@ -140,8 +156,7 @@ export default function ProgramacaoPage() {
                     <AttractionCard
                       key={attraction.id}
                       attraction={attraction}
-                      isPremium={isPremium}
-                      onUnlock={openPaymentModal}
+                      isPremium={true}
                     />
                   ))}
                 </div>

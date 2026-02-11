@@ -3,7 +3,7 @@
 import { Business, BusinessCategory } from '@/types';
 import { CATEGORY_LABELS, formatPhone } from '@/lib/utils';
 import Image from 'next/image';
-import { X, MapPin, Phone, Instagram, Globe } from 'lucide-react';
+import { X, MapPin, Phone, Instagram, Globe, Navigation } from 'lucide-react';
 import { useEffect } from 'react';
 
 interface EstablishmentModalProps {
@@ -187,20 +187,17 @@ export default function EstablishmentModal({ business, isOpen, onClose }: Establ
                         )}
                     </div>
 
-                    {/* Map */}
+                    {/* Route Button */}
                     {business.latitude && business.longitude && (
-                        <div>
-                            <h3 className="font-bold text-surface-900 mb-3">Localização</h3>
-                            <div className="aspect-video bg-surface-100 rounded-xl overflow-hidden">
-                                <iframe
-                                    width="100%"
-                                    height="100%"
-                                    frameBorder="0"
-                                    src={`https://www.google.com/maps?q=${business.latitude},${business.longitude}&output=embed`}
-                                    allowFullScreen
-                                ></iframe>
-                            </div>
-                        </div>
+                        <a
+                            href={`https://www.google.com/maps/dir/?api=1&destination=${business.latitude},${business.longitude}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-white font-bold text-sm carnival-gradient shadow-md active:scale-95 transition-all"
+                        >
+                            <Navigation size={18} />
+                            Abrir rota no Maps
+                        </a>
                     )}
                 </div>
             </div>

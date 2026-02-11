@@ -111,6 +111,8 @@ export type BusinessCategory =
   | 'pharmacy'
   | 'market'
   | 'gas_station'
+  | 'hospital'
+  | 'health_post'
   | 'other';
 
 export type EmergencyCategory =

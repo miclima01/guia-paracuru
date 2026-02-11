@@ -230,7 +230,8 @@ INSERT INTO app_settings (key, value) VALUES
   ('premium_price', '1.99'),
   ('premium_duration_days', '7'),
   ('hero_image', ''),
-  ('about_text', 'Bem-vindo ao Guia Paracuru! Seu guia completo para o Carnaval de Paracuru 2026.');
+  ('about_text', 'Bem-vindo ao Guia Paracuru! Seu guia completo para o Carnaval de Paracuru 2026.'),
+  ('support_whatsapp', '85994293148');
 
 -- Sample emergency contacts
 INSERT INTO emergency_contacts (name, phone, category, icon, order_index) VALUES

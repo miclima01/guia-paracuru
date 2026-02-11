@@ -147,3 +147,64 @@ export async function saveSettings(values: Record<string, string>) {
 
     return true;
 }
+
+export async function uploadHeroImage(formData: FormData): Promise<string> {
+    await ensureAdmin();
+
+    const file = formData.get('file') as File;
+    if (!file) {
+        throw new Error('Nenhum arquivo fornecido');
+    }
+
+    // Validar tipo de arquivo
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+        throw new Error('Formato inválido. Use JPG, PNG ou WebP');
+    }
+
+    // Validar tamanho (máx 5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+        throw new Error('Arquivo muito grande. Máximo 5MB');
+    }
+
+    const supabase = createAdminClient();
+
+    // Deletar imagem anterior se existir
+    const { data: currentSetting } = await supabase
+        .from('app_settings')
+        .select('value')
+        .eq('key', 'hero_background_image')
+        .single();
+
+    if (currentSetting?.value?.includes('/storage/v1/object/public/media/')) {
+        // Extrair path da URL antiga e deletar
+        const oldPath = currentSetting.value.split('/media/')[1];
+        if (oldPath) {
+            await supabase.storage.from('media').remove([oldPath]);
+        }
+    }
+
+    // Upload nova imagem
+    const timestamp = Date.now();
+    const ext = file.name.split('.').pop();
+    const fileName = `hero/hero-${timestamp}.${ext}`;
+
+    const { data, error } = await supabase.storage
+        .from('media')
+        .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+        });
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    // Retornar URL pública
+    const { data: { publicUrl } } = supabase.storage
+        .from('media')
+        .getPublicUrl(fileName);
+
+    return publicUrl;
+}

@@ -7,10 +7,10 @@ import { useAppStore } from '@/hooks/useStore';
 
 const navItems = [
   { href: '/', icon: Home, label: 'Início', needsPremium: false },
-  { href: '/programacao', icon: Calendar, label: 'Programação', needsPremium: true },
-  { href: '/mapa', icon: MapPin, label: 'Mapa', needsPremium: true },
-  { href: '/noticias', icon: Newspaper, label: 'Notícias', needsPremium: true },
-  { href: '/contatos', icon: Phone, label: 'Contatos', needsPremium: true },
+  { href: '/programacao', icon: Calendar, label: 'Programação', needsPremium: false },
+  { href: '/mapa', icon: MapPin, label: 'Mapa', needsPremium: false },
+  { href: '/noticias', icon: Newspaper, label: 'Notícias', needsPremium: false },
+  { href: '/contatos', icon: Phone, label: 'Contatos', needsPremium: false },
 ];
 
 export default function BottomNav() {

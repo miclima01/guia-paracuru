@@ -12,17 +12,20 @@ export default function ContatosPage() {
   const [transportContacts, setTransportContacts] = useState<TransportContact[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTransportType, setSelectedTransportType] = useState<'taxi' | 'mototaxi'>('taxi');
+  const [supportWhatsapp, setSupportWhatsapp] = useState('');
 
   useEffect(() => {
     async function loadContacts() {
       try {
-        const [emergencyRes, transportRes] = await Promise.all([
+        const [emergencyRes, transportRes, whatsappRes] = await Promise.all([
           supabase.from('emergency_contacts').select('*').order('order_index'),
           supabase.from('transport_contacts').select('*').order('category').order('name'),
+          supabase.from('app_settings').select('value').eq('key', 'support_whatsapp').single(),
         ]);
 
         if (emergencyRes.data) setEmergencyContacts(emergencyRes.data);
         if (transportRes.data) setTransportContacts(transportRes.data);
+        if (whatsappRes.data?.value) setSupportWhatsapp(whatsappRes.data.value);
       } catch (error) {
         console.error('Error loading contacts:', error);
       } finally {
@@ -183,7 +186,7 @@ export default function ContatosPage() {
               <p className="font-bold text-sm opacity-90 mb-1">Quer seu número aqui?</p>
               <p className="text-xs opacity-75 max-w-[200px]">Destaque seu serviço de transporte para milhares de foliões.</p>
             </div>
-            <Link href="https://wa.me/5585994293148" target="_blank" className="bg-white text-purple-600 px-4 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-purple-50 transition-colors">
+            <Link href={`https://wa.me/55${supportWhatsapp || '85994293148'}`} target="_blank" className="bg-white text-purple-600 px-4 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-purple-50 transition-colors">
               Anunciar
             </Link>
           </div>
