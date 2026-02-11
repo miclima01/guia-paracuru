@@ -334,18 +334,7 @@ export default function AttractionAdminModal({ isOpen, onClose, onSave, initialD
                             </label>
                         </div>
 
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="checkbox"
-                                id="is_premium"
-                                checked={formData.is_premium}
-                                onChange={(e) => setFormData({ ...formData, is_premium: e.target.checked })}
-                                className="w-4 h-4 text-carnival-600 rounded border-surface-300 focus:ring-carnival-500"
-                            />
-                            <label htmlFor="is_premium" className="text-sm font-medium text-surface-700 select-none">
-                                Conteúdo Premium (requer acesso pago)
-                            </label>
-                        </div>
+
                     </div>
 
                     <div className="flex items-center justify-end gap-3 pt-4 border-t border-surface-100">

@@ -29,11 +29,6 @@ export default function AtracoesAdminPage() {
       render: (value: string) => value?.substring(0, 5) || '-',
     },
     { key: 'location' as const, label: 'Local' },
-    {
-      key: 'is_premium' as const,
-      label: 'Premium',
-      render: (value: boolean) => (value ? '✅' : '❌'),
-    },
   ];
 
   function handleAdd() {

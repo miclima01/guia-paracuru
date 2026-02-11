@@ -345,7 +345,7 @@ export default function EstablishmentModal({
                     </div>
 
                     {/* Flags */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-surface-100 pt-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-surface-100 pt-4">
                         <div className="flex items-center gap-2">
                             <input
                                 type="checkbox"
@@ -356,18 +356,6 @@ export default function EstablishmentModal({
                             />
                             <label htmlFor="is_partner" className="text-sm font-medium text-surface-700 select-none">
                                 Parceiro (Verificado)
-                            </label>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="checkbox"
-                                id="is_premium"
-                                checked={formData.is_premium || false}
-                                onChange={(e) => handleChange('is_premium', e.target.checked)}
-                                className="w-4 h-4 text-carnival-600 rounded border-surface-300 focus:ring-carnival-500"
-                            />
-                            <label htmlFor="is_premium" className="text-sm font-medium text-surface-700 select-none">
-                                Premium
                             </label>
                         </div>
                         <div className="flex items-center gap-2">

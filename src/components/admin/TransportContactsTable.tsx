@@ -23,11 +23,6 @@ export default function TransportContactsTable() {
             label: 'Tipo',
             render: (value: string) => (value === 'taxi' ? '🚕 Táxi' : '🏍️ Mototáxi'),
         },
-        {
-            key: 'is_premium' as const,
-            label: 'Premium',
-            render: (value: boolean) => (value ? '✨' : '-'),
-        },
         { key: 'order_index' as const, label: 'Ordem' },
     ];
 

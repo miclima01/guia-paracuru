@@ -23,11 +23,6 @@ export default function TransporteAdminPage() {
       label: 'Tipo',
       render: (value: string) => (value === 'taxi' ? '🚕 Táxi' : '🏍️ Mototáxi'),
     },
-    {
-      key: 'is_premium' as const,
-      label: 'Premium',
-      render: (value: boolean) => (value ? '✨' : '-'),
-    },
   ];
 
   async function handleSave(data: Partial<TransportContact>) {

@@ -1,23 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Save, Car, Bike, Star } from 'lucide-react';
-import type { TransportContact } from '@/types';
+import { X, Save, Phone } from 'lucide-react';
+import type { EmergencyContact } from '@/types';
 
-interface TransportAdminModalProps {
+interface EmergencyContactModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (data: Partial<TransportContact>) => Promise<void>;
-    initialData?: TransportContact;
+    onSave: (data: Partial<EmergencyContact>) => Promise<void>;
+    initialData?: EmergencyContact;
 }
 
-export default function TransportAdminModal({ isOpen, onClose, onSave, initialData }: TransportAdminModalProps) {
+export default function EmergencyContactModal({ isOpen, onClose, onSave, initialData }: EmergencyContactModalProps) {
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState<Partial<TransportContact>>({
+    const [formData, setFormData] = useState<Partial<EmergencyContact>>({
         name: '',
         phone: '',
-        category: 'taxi',
-        is_premium: false,
+        category: '',
+        icon: '',
         order_index: 0,
     });
 
@@ -28,8 +28,8 @@ export default function TransportAdminModal({ isOpen, onClose, onSave, initialDa
             setFormData({
                 name: '',
                 phone: '',
-                category: 'taxi',
-                is_premium: false,
+                category: '',
+                icon: '',
                 order_index: 0,
             });
         }
@@ -50,12 +50,17 @@ export default function TransportAdminModal({ isOpen, onClose, onSave, initialDa
             return;
         }
 
+        if (!formData.category?.trim()) {
+            alert('Categoria é obrigatória');
+            return;
+        }
+
         setLoading(true);
         try {
             await onSave(formData);
             onClose();
         } catch (error) {
-            console.error('Error saving transport contact:', error);
+            console.error('Error saving emergency contact:', error);
             alert('Erro ao salvar contato');
         } finally {
             setLoading(false);
@@ -67,7 +72,7 @@ export default function TransportAdminModal({ isOpen, onClose, onSave, initialDa
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
                 <div className="flex items-center justify-between p-6 border-b border-surface-100 bg-white">
                     <h2 className="text-xl font-bold text-surface-900">
-                        {initialData ? 'Editar Transporte' : 'Novo Transporte'}
+                        {initialData ? 'Editar Contato de Emergência' : 'Novo Contato de Emergência'}
                     </h2>
                     <button
                         onClick={onClose}
@@ -81,62 +86,67 @@ export default function TransportAdminModal({ isOpen, onClose, onSave, initialDa
                     {/* Name */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 mb-1">
-                            Nome / Apelido *
+                            Nome *
                         </label>
                         <input
                             type="text"
                             required
                             value={formData.name || ''}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="w-full px-4 py-2 rounded-lg border border-surface-200 focus:border-carnival-500 focus:ring-2 focus:ring-carnival-200 outline-none transition-all"
-                            placeholder="Ex: Taxista João"
+                            className="w-full px-4 py-2 rounded-lg border border-surface-200 focus:border-fire-500 focus:ring-2 focus:ring-fire-200 outline-none transition-all"
+                            placeholder="Ex: Hospital / Pronto Socorro"
                         />
                     </div>
 
                     {/* Phone */}
                     <div>
                         <label className="block text-sm font-medium text-surface-700 mb-1">
-                            Telefone / WhatsApp *
+                            Telefone *
                         </label>
                         <input
                             type="tel"
                             required
                             value={formData.phone || ''}
                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                            className="w-full px-4 py-2 rounded-lg border border-surface-200 focus:border-carnival-500 focus:ring-2 focus:ring-carnival-200 outline-none transition-all"
-                            placeholder="(85) 90000-0000"
+                            className="w-full px-4 py-2 rounded-lg border border-surface-200 focus:border-fire-500 focus:ring-2 focus:ring-fire-200 outline-none transition-all"
+                            placeholder="192"
                         />
                     </div>
 
                     {/* Category */}
                     <div>
-                        <label className="block text-sm font-medium text-surface-700 mb-3">
-                            Tipo de Transporte
+                        <label className="block text-sm font-medium text-surface-700 mb-1">
+                            Categoria *
                         </label>
-                        <div className="flex gap-3">
-                            <button
-                                type="button"
-                                onClick={() => setFormData({ ...formData, category: 'taxi' })}
-                                className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${formData.category === 'taxi'
-                                    ? 'border-carnival-500 bg-carnival-50 text-carnival-700'
-                                    : 'border-surface-100 hover:border-surface-200 text-surface-500'
-                                    }`}
-                            >
-                                <Car size={24} />
-                                <span className="text-sm font-bold">Táxi</span>
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setFormData({ ...formData, category: 'mototaxi' })}
-                                className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${formData.category === 'mototaxi'
-                                    ? 'border-carnival-500 bg-carnival-50 text-carnival-700'
-                                    : 'border-surface-100 hover:border-surface-200 text-surface-500'
-                                    }`}
-                            >
-                                <Bike size={24} />
-                                <span className="text-sm font-bold">Mototáxi</span>
-                            </button>
-                        </div>
+                        <select
+                            required
+                            value={formData.category || ''}
+                            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                            className="w-full px-4 py-2 rounded-lg border border-surface-200 focus:border-fire-500 focus:ring-2 focus:ring-fire-200 outline-none transition-all"
+                        >
+                            <option value="">Selecione uma categoria</option>
+                            <option value="hospital">Hospital</option>
+                            <option value="police">Polícia</option>
+                            <option value="fire">Bombeiros</option>
+                            <option value="other">Outro</option>
+                        </select>
+                    </div>
+
+                    {/* Icon */}
+                    <div>
+                        <label className="block text-sm font-medium text-surface-700 mb-1">
+                            Ícone
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.icon || ''}
+                            onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                            className="w-full px-4 py-2 rounded-lg border border-surface-200 focus:border-fire-500 focus:ring-2 focus:ring-fire-200 outline-none transition-all"
+                            placeholder="Ex: shield, stethoscope, flame"
+                        />
+                        <p className="text-xs text-surface-500 mt-1">
+                            Nome do ícone Lucide (opcional)
+                        </p>
                     </div>
 
                     {/* Order Index */}
@@ -149,7 +159,7 @@ export default function TransportAdminModal({ isOpen, onClose, onSave, initialDa
                             min="0"
                             value={formData.order_index || 0}
                             onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })}
-                            className="w-full px-4 py-2 rounded-lg border border-surface-200 focus:border-carnival-500 focus:ring-2 focus:ring-carnival-200 outline-none transition-all"
+                            className="w-full px-4 py-2 rounded-lg border border-surface-200 focus:border-fire-500 focus:ring-2 focus:ring-fire-200 outline-none transition-all"
                         />
                     </div>
 
@@ -164,7 +174,7 @@ export default function TransportAdminModal({ isOpen, onClose, onSave, initialDa
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex items-center gap-2 px-6 py-2 text-sm font-semibold text-white bg-carnival-500 hover:bg-carnival-600 active:bg-carnival-700 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex items-center gap-2 px-6 py-2 text-sm font-semibold text-white bg-fire-500 hover:bg-fire-600 active:bg-fire-700 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <Save size={18} />
                             {loading ? 'Salvando...' : 'Salvar'}
