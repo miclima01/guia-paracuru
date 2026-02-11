@@ -1,0 +1,146 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  * {
+    @apply border-surface-200;
+  }
+
+  body {
+    @apply bg-surface-50 text-surface-900 antialiased;
+  }
+}
+
+@layer components {
+
+  /* Carnival gradient */
+  .carnival-gradient {
+    @apply bg-gradient-to-br from-fire-500 via-carnival-500 to-sand-500;
+  }
+
+  .carnival-gradient-dark {
+    @apply bg-gradient-to-br from-fire-600 via-carnival-600 to-sand-600;
+  }
+
+  /* Premium shimmer effect */
+  .premium-shimmer {
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 3s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* Noise texture */
+  .noise {
+    position: relative;
+  }
+
+  .noise::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.05;
+    pointer-events: none;
+  }
+
+  /* Category pill */
+  .category-pill {
+    @apply inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide;
+  }
+
+  /* Safe area for mobile */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* Card hover effect */
+  .card-hover {
+    @apply transition-all hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.99];
+  }
+
+  /* Glass morphism */
+  .glass {
+    @apply bg-white/80 backdrop-blur-md border border-white/20;
+  }
+
+  /* Input styles */
+  .input {
+    @apply w-full px-4 py-3 rounded-xl border border-surface-200 bg-white text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-fire-500 focus:border-transparent transition-all;
+  }
+
+  .textarea {
+    @apply input min-h-[120px] resize-y;
+  }
+
+  .select {
+    @apply input appearance-none bg-white cursor-pointer;
+  }
+
+  /* Button styles */
+  .btn {
+    @apply px-4 py-2 rounded-xl font-semibold transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn carnival-gradient text-white shadow-md hover:shadow-lg;
+  }
+
+  .btn-secondary {
+    @apply btn bg-surface-100 text-surface-900 hover:bg-surface-200;
+  }
+
+  .btn-danger {
+    @apply btn bg-fire-500 text-white hover:bg-fire-600;
+  }
+
+  /* Admin styles */
+  .admin-header {
+    @apply bg-white border-b border-surface-200 px-6 py-4;
+  }
+
+  .admin-container {
+    @apply max-w-6xl mx-auto px-6 py-8;
+  }
+
+  .admin-card {
+    @apply bg-white rounded-2xl shadow-sm border border-surface-100 p-6;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
