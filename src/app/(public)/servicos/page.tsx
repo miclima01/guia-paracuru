@@ -58,43 +58,45 @@ export default function ServicesPage() {
     return (
         <div className="min-h-screen pb-20">
             {/* Header */}
-            <header className="bg-emerald-600 text-white pt-8 pb-12 px-4 rounded-b-[2rem] shadow-lg sm:rounded-xl sm:mx-auto sm:max-w-2xl sm:mt-4">
-                <div className="max-w-2xl mx-auto text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/20 mb-4 backdrop-blur-sm">
-                        <ShoppingBag size={24} />
+            {/* Header */}
+            <section className="px-0 sm:px-4 sm:pt-4 pb-2 max-w-2xl mx-auto">
+                <div className="bg-gradient-to-br from-emerald-600 to-teal-600 noise sm:rounded-xl shadow-xl">
+                    <div className="px-5 pt-8 pb-6 text-center">
+                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/20 mb-4 backdrop-blur-sm">
+                            <ShoppingBag size={24} className="text-white" />
+                        </div>
+                        <h1 className="font-display text-3xl mb-2 text-white">Serviços</h1>
+                        <p className="text-white/80">Pousadas, hospitais, farmácias e mais</p>
                     </div>
-                    <h1 className="font-display text-3xl mb-2">Serviços</h1>
-                    <p className="text-white/80">Pousadas, hospitais, farmácias e mais</p>
                 </div>
-            </header>
+            </section>
 
-            {/* Filters */}
-            <div className="px-4 -mt-6 max-w-2xl mx-auto relative z-10">
-                <div className="bg-white rounded-xl shadow-md p-4 space-y-4">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-400" size={18} />
-                        <input
-                            type="text"
-                            placeholder="Buscar serviço..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 bg-surface-50 rounded-lg text-sm outline-none focus:ring-2 focus:ring-emerald-200 transition-all"
-                        />
-                    </div>
-                    <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-                        {categories.map(cat => (
-                            <button
-                                key={cat.id}
-                                onClick={() => setSelectedCategory(cat.id)}
-                                className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${selectedCategory === cat.id
-                                    ? 'bg-emerald-500 text-white'
-                                    : 'bg-surface-100 text-surface-600 hover:bg-surface-200'
-                                    }`}
-                            >
-                                {cat.label}
-                            </button>
-                        ))}
-                    </div>
+            {/* Search and Filters */}
+            <div className="px-4 mt-6 max-w-2xl mx-auto space-y-4">
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-400" size={18} />
+                    <input
+                        type="text"
+                        placeholder="Buscar serviço..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 bg-white border border-surface-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm"
+                    />
+                </div>
+
+                <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                    {categories.map(cat => (
+                        <button
+                            key={cat.id}
+                            onClick={() => setSelectedCategory(cat.id)}
+                            className={`shrink-0 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${selectedCategory === cat.id
+                                ? 'bg-gradient-to-br from-emerald-600 to-teal-600 text-white shadow-md'
+                                : 'bg-white border border-surface-200 text-surface-600 hover:bg-surface-50'
+                                }`}
+                        >
+                            {cat.label}
+                        </button>
+                    ))}
                 </div>
             </div>
 
