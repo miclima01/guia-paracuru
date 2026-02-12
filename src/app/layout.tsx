@@ -33,7 +33,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fcmcccohjoizjvkkauhz.supabase.co" />
         <link rel="preconnect" href="https://www.transparenttextures.com" />
       </head>
-      <body className={inter.variable}>
+      <body className={inter.variable} suppressHydrationWarning>
         {children}
         <Toaster
           position="top-center"
