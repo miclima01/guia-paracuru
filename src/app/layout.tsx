@@ -28,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fcmcccohjoizjvkkauhz.supabase.co" />
         <link rel="preconnect" href="https://www.transparenttextures.com" />

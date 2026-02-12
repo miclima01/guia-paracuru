@@ -102,6 +102,7 @@ export default function HomePageClient({
                                 fill
                                 sizes="(max-width: 672px) 100vw, 672px"
                                 priority
+                                loading="eager"
                             />
                             <div className="absolute inset-0 bg-fire-900/70 backdrop-blur-[1px]" />
                         </div>
@@ -121,6 +122,7 @@ export default function HomePageClient({
                                     width={280}
                                     height={280}
                                     className="drop-shadow-xl"
+                                    style={{ height: 'auto' }}
                                     priority
                                 />
                             </motion.div>
