@@ -129,8 +129,8 @@ export default function MapaPage() {
           <button
             onClick={() => setSelectedCategory('all')}
             className={`shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${selectedCategory === 'all'
-                ? 'carnival-gradient text-white'
-                : 'bg-surface-100 text-surface-600 hover:bg-surface-200'
+              ? 'carnival-gradient text-white'
+              : 'bg-surface-100 text-surface-600 hover:bg-surface-200'
               }`}
           >
             <MapPin size={14} />
@@ -141,8 +141,8 @@ export default function MapaPage() {
               key={id}
               onClick={() => setSelectedCategory(id)}
               className={`shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition-all ${selectedCategory === id
-                  ? 'carnival-gradient text-white'
-                  : 'bg-surface-100 text-surface-600 hover:bg-surface-200'
+                ? 'carnival-gradient text-white'
+                : 'bg-surface-100 text-surface-600 hover:bg-surface-200'
                 }`}
             >
               {label}
@@ -242,7 +242,7 @@ export default function MapaPage() {
         {!loading && markers.length > 0 && (
           <button
             onClick={() => setViewMode(prev => prev === 'map' ? 'list' : 'map')}
-            className="fixed bottom-20 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-full shadow-lg bg-surface-900 text-white font-semibold text-sm hover:scale-105 active:scale-95 transition-all"
+            className="fixed bottom-20 left-4 z-50 flex items-center gap-2 px-4 py-3 rounded-full shadow-lg bg-surface-900 text-white font-semibold text-sm hover:scale-105 active:scale-95 transition-all"
           >
             {viewMode === 'map' ? (
               <>
