@@ -90,9 +90,9 @@ export default function HomePageClient({
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeInVariants}
-                className="px-4 pt-4 pb-2 max-w-2xl mx-auto"
+                className="px-0 sm:px-4 sm:pt-4 pb-2 max-w-2xl mx-auto"
             >
-                <div className="relative overflow-hidden rounded-xl shadow-xl bg-gradient-to-br from-fire-800 to-fire-600">
+                <div className="relative overflow-hidden sm:rounded-xl shadow-xl bg-gradient-to-br from-fire-800 to-fire-600">
                     {heroImage && (
                         <div className="absolute inset-0 z-0">
                             <Image
@@ -163,13 +163,13 @@ export default function HomePageClient({
             </motion.section>
 
             {/* Quick Links */}
-            <section className="mt-8 max-w-2xl mx-auto pl-4">
+            <section className="mt-8 max-w-2xl mx-auto">
                 <motion.div
                     variants={containerVariants}
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: "-50px" }}
-                    className="flex overflow-x-auto gap-3 pb-4 pr-4 no-scrollbar"
+                    className="flex overflow-x-auto gap-3 pb-4 px-4 no-scrollbar"
                 >
                     {quickLinks.map((link) => {
                         const Icon = link.icon;
