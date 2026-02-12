@@ -199,7 +199,7 @@ export default function ConfiguracoesPage() {
                       </label>
                     </div>
 
-                    {setting.key.includes('hero_image') ? (
+                    {setting.key.includes('image') ? (
                       <div className="space-y-4 bg-surface-50 p-4 rounded-xl border border-surface-200">
                         {/* Preview Area */}
                         <div className="relative w-full h-48 rounded-lg overflow-hidden bg-surface-200 shadow-inner group">
@@ -221,63 +221,43 @@ export default function ConfiguracoesPage() {
                           )}
                         </div>
 
-                        {/* Controls */}
-                        <div className="flex flex-col gap-3">
-                          <div className="flex gap-2">
-                            <input
-                              type="text"
-                              value={values[setting.key] || ''}
-                              onChange={(e) =>
-                                setValues({ ...values, [setting.key]: e.target.value })
+                        {/* Upload */}
+                        <div className="flex gap-2">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                if (previewUrl) URL.revokeObjectURL(previewUrl);
+                                setSelectedFile(file);
+                                setSelectedSettingKey(setting.key);
+                                setPreviewUrl(URL.createObjectURL(file));
                               }
-                              placeholder={setting.placeholder}
-                              className="input text-sm font-mono"
-                            />
-                          </div>
+                            }}
+                            className="hidden"
+                            id={`upload-${setting.key}`}
+                          />
+                          <label
+                            htmlFor={`upload-${setting.key}`}
+                            className="flex-1 btn-secondary text-sm py-2 cursor-pointer text-center"
+                          >
+                            {selectedSettingKey === setting.key && selectedFile ? (
+                              selectedFile.name.length > 25
+                                ? selectedFile.name.substring(0, 15) + '...' + selectedFile.name.substring(selectedFile.name.length - 7)
+                                : selectedFile.name
+                            ) : 'Escolher Arquivo'}
+                          </label>
 
-                          <div className="flex items-center gap-3">
-                            <div className="h-px bg-surface-200 flex-1" />
-                            <span className="text-xs text-surface-400 font-medium">OU</span>
-                            <div className="h-px bg-surface-200 flex-1" />
-                          </div>
-
-                          <div className="flex gap-2">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) {
-                                  if (previewUrl) URL.revokeObjectURL(previewUrl);
-                                  setSelectedFile(file);
-                                  setSelectedSettingKey(setting.key);
-                                  setPreviewUrl(URL.createObjectURL(file));
-                                }
-                              }}
-                              className="hidden"
-                              id={`upload-${setting.key}`}
-                            />
-                            <label
-                              htmlFor={`upload-${setting.key}`}
-                              className="flex-1 btn-secondary text-sm py-2 cursor-pointer text-center"
+                          {selectedSettingKey === setting.key && selectedFile && (
+                            <button
+                              onClick={() => handleImageUpload(setting.key)}
+                              disabled={uploadingImage}
+                              className="btn-primary py-2 px-4"
                             >
-                              {selectedSettingKey === setting.key && selectedFile ? (
-                                selectedFile.name.length > 25
-                                  ? selectedFile.name.substring(0, 15) + '...' + selectedFile.name.substring(selectedFile.name.length - 7)
-                                  : selectedFile.name
-                              ) : 'Escolher Arquivo'}
-                            </label>
-
-                            {selectedSettingKey === setting.key && selectedFile && (
-                              <button
-                                onClick={() => handleImageUpload(setting.key)}
-                                disabled={uploadingImage}
-                                className="btn-primary py-2 px-4"
-                              >
-                                {uploadingImage ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Upload size={16} />}
-                              </button>
-                            )}
-                          </div>
+                              {uploadingImage ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Upload size={16} />}
+                            </button>
+                          )}
                         </div>
                       </div>
                     ) : (
