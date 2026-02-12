@@ -148,7 +148,7 @@ export async function saveSettings(values: Record<string, string>) {
     return true;
 }
 
-export async function uploadHeroImage(formData: FormData): Promise<string> {
+export async function uploadHeroImage(formData: FormData, key: string = 'hero_background_image'): Promise<string> {
     await ensureAdmin();
 
     const file = formData.get('file') as File;
@@ -174,7 +174,7 @@ export async function uploadHeroImage(formData: FormData): Promise<string> {
     const { data: currentSetting } = await supabase
         .from('app_settings')
         .select('value')
-        .eq('key', 'hero_background_image')
+        .eq('key', key)
         .single();
 
     if (currentSetting?.value?.includes('/storage/v1/object/public/media/')) {
@@ -188,7 +188,9 @@ export async function uploadHeroImage(formData: FormData): Promise<string> {
     // Upload nova imagem
     const timestamp = Date.now();
     const ext = file.name.split('.').pop();
-    const fileName = `hero/hero-${timestamp}.${ext}`;
+    // Sanitize key for filename
+    const safeKey = key.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+    const fileName = `hero/${safeKey}-${timestamp}.${ext}`;
 
     const { data, error } = await supabase.storage
         .from('media')

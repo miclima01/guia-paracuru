@@ -60,7 +60,8 @@ const settingsGroups: SettingsGroup[] = [
     description: 'Personalização visual do app',
     icon: Palette,
     settings: [
-      { key: 'hero_background_image', value: '', label: 'Imagem de Fundo da Hero (URL)', type: 'text', placeholder: 'https://...', colSpan: 2 },
+      { key: 'hero_background_image', value: '', label: 'Imagem de Fundo da Hero - Home (URL)', type: 'text', placeholder: 'https://...', colSpan: 2 },
+      { key: 'programacao_hero_image', value: '', label: 'Imagem de Fundo da Hero - Programação (URL)', type: 'text', placeholder: 'https://...', colSpan: 2 },
       // Future: Color scheme, Logo URL, etc.
     ]
   },
@@ -82,6 +83,7 @@ export default function ConfiguracoesPage() {
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedSettingKey, setSelectedSettingKey] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -112,7 +114,7 @@ export default function ConfiguracoesPage() {
     }
   }
 
-  async function handleImageUpload() {
+  async function handleImageUpload(key: string) {
     if (!selectedFile) return;
 
     setUploadingImage(true);
@@ -120,10 +122,11 @@ export default function ConfiguracoesPage() {
       const formData = new FormData();
       formData.append('file', selectedFile);
 
-      const url = await uploadHeroImage(formData);
-      setValues({ ...values, hero_background_image: url });
+      const url = await uploadHeroImage(formData, key);
+      setValues({ ...values, [key]: url });
       toast.success('Imagem enviada com sucesso!');
       setSelectedFile(null);
+      setSelectedSettingKey(null);
       setPreviewUrl(null);
     } catch (error: any) {
       toast.error(error.message || 'Erro ao enviar imagem');
@@ -196,15 +199,15 @@ export default function ConfiguracoesPage() {
                       </label>
                     </div>
 
-                    {setting.key === 'hero_background_image' ? (
+                    {setting.key.includes('hero_image') || setting.key === 'hero_background_image' ? (
                       <div className="space-y-4 bg-surface-50 p-4 rounded-xl border border-surface-200">
                         {/* Preview Area */}
                         <div className="relative w-full h-48 rounded-lg overflow-hidden bg-surface-200 shadow-inner group">
-                          {(previewUrl || values[setting.key]) ? (
+                          {((selectedSettingKey === setting.key && previewUrl) || values[setting.key]) ? (
                             <>
                               <Image
-                                src={previewUrl || values[setting.key]}
-                                alt="Hero preview"
+                                src={(selectedSettingKey === setting.key && previewUrl) ? previewUrl : values[setting.key]}
+                                alt="Previsualização"
                                 fill
                                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                               />
@@ -246,22 +249,23 @@ export default function ConfiguracoesPage() {
                                 const file = e.target.files?.[0];
                                 if (file) {
                                   setSelectedFile(file);
+                                  setSelectedSettingKey(setting.key);
                                   setPreviewUrl(URL.createObjectURL(file));
                                 }
                               }}
                               className="hidden"
-                              id="hero-upload"
+                              id={`upload-${setting.key}`}
                             />
                             <label
-                              htmlFor="hero-upload"
+                              htmlFor={`upload-${setting.key}`}
                               className="flex-1 btn-secondary text-sm py-2 cursor-pointer text-center"
                             >
-                              {selectedFile ? selectedFile.name : 'Escolher Arquivo'}
+                              {selectedSettingKey === setting.key && selectedFile ? selectedFile.name : 'Escolher Arquivo'}
                             </label>
 
-                            {selectedFile && (
+                            {selectedSettingKey === setting.key && selectedFile && (
                               <button
-                                onClick={handleImageUpload}
+                                onClick={() => handleImageUpload(setting.key)}
                                 disabled={uploadingImage}
                                 className="btn-primary py-2 px-4"
                               >

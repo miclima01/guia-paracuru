@@ -15,6 +15,7 @@ export default function ProgramacaoPage() {
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [carnivalDates, setCarnivalDates] = useState<string>('13 A 17 DE FEVEREIRO, 2026');
+  const [heroImage, setHeroImage] = useState<string>('https://images.unsplash.com/photo-1514525253440-b393452e233e?q=80&w=1000&auto=format&fit=crop');
   const [selectedAttraction, setSelectedAttraction] = useState<Attraction | null>(null);
   const [showModal, setShowModal] = useState(false);
   const tabsRef = useRef<HTMLDivElement>(null);
@@ -44,21 +45,26 @@ export default function ProgramacaoPage() {
 
   useEffect(() => {
     loadAttractions();
-    loadCarnivalDates();
+    loadSettings();
   }, []);
 
-  async function loadCarnivalDates() {
+  async function loadSettings() {
     try {
-      const [startRes, endRes] = await Promise.all([
+      const [startRes, endRes, heroRes] = await Promise.all([
         supabase.from('app_settings').select('value').eq('key', 'carnival_start_date').single(),
         supabase.from('app_settings').select('value').eq('key', 'carnival_end_date').single(),
+        supabase.from('app_settings').select('value').eq('key', 'programacao_hero_image').single(),
       ]);
 
       if (startRes.data?.value && endRes.data?.value) {
         setCarnivalDates(formatCarnivalDateRangeUppercase(startRes.data.value, endRes.data.value));
       }
+
+      if (heroRes.data?.value) {
+        setHeroImage(heroRes.data.value);
+      }
     } catch (error) {
-      console.error('Error loading carnival dates:', error);
+      console.error('Error loading settings:', error);
     }
   }
 
@@ -112,7 +118,10 @@ export default function ProgramacaoPage() {
       >
         <div className="relative bg-gradient-to-br from-fuchsia-500 to-pink-600 text-white sm:rounded-xl shadow-xl overflow-hidden">
           {/* Decorative elements */}
-          <div className="absolute top-0 left-0 w-full h-full opacity-30 bg-[url('https://images.unsplash.com/photo-1514525253440-b393452e233e?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center" />
+          <div
+            className="absolute top-0 left-0 w-full h-full opacity-30 bg-cover bg-center transition-all duration-700"
+            style={{ backgroundImage: `url('${heroImage}')` }}
+          />
 
           <div className="relative z-10 px-5 pt-8 pb-6 text-center">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/20 mb-4 backdrop-blur-sm">
