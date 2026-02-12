@@ -26,6 +26,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
+      <head>
+        <link rel="preconnect" href="https://fcmcccohjoizjvkkauhz.supabase.co" />
+        <link rel="preconnect" href="https://www.transparenttextures.com" />
+      </head>
       <body className={inter.variable}>
         {children}
         <Toaster

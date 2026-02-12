@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import { ChevronRight, Clock, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
@@ -50,10 +51,15 @@ export default function NewsSlider({ news, supportWhatsapp }: NewsSliderProps) {
                                 {/* Background Image (Optional, with overlay) */}
                                 {item.image_url && (
                                     <>
-                                        <div
-                                            className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"
-                                            style={{ backgroundImage: `url(${item.image_url})` }}
-                                        />
+                                        <div className="absolute inset-0">
+                                            <Image
+                                                src={item.image_url}
+                                                alt={item.title}
+                                                fill
+                                                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                            />
+                                        </div>
                                         <div className="absolute inset-0 bg-fire-900/70 backdrop-blur-[1px]" />
                                     </>
                                 )}

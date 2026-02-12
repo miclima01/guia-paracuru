@@ -252,7 +252,13 @@ export default function HomePageClient({
                             >
                                 <div className="h-[60%] bg-surface-100 overflow-hidden relative">
                                     {biz.image_url ? (
-                                        <Image src={biz.image_url} alt={biz.name} className="w-full h-full object-cover" fill sizes="242px" />
+                                        <Image
+                                            src={biz.image_url}
+                                            alt={biz.name}
+                                            className="w-full h-full object-cover"
+                                            fill
+                                            sizes="(max-width: 768px) 50vw, 242px"
+                                        />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-surface-300">
                                             <Store size={28} />
