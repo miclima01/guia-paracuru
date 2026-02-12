@@ -11,7 +11,7 @@ async function ensureAdmin() {
     }
 }
 
-export async function getAdminItems(table: string, options?: { orderBy?: { column: string; ascending?: boolean }; filter?: { column: string; value: any } }) {
+export async function getAdminItems(table: string, options?: { orderBy?: { column: string; ascending?: boolean }; filter?: { column: string; value: string | number | boolean } }) {
     await ensureAdmin();
     const supabase = createAdminClient();
 
@@ -36,7 +36,7 @@ export async function getAdminItems(table: string, options?: { orderBy?: { colum
     return data;
 }
 
-export async function createAdminItem(table: string, data: any) {
+export async function createAdminItem(table: string, data: Record<string, unknown>) {
     await ensureAdmin();
     const supabase = createAdminClient();
 
@@ -53,7 +53,7 @@ export async function createAdminItem(table: string, data: any) {
     return newItem;
 }
 
-export async function updateAdminItem(table: string, id: string, data: any) {
+export async function updateAdminItem(table: string, id: string, data: Record<string, unknown>) {
     await ensureAdmin();
     const supabase = createAdminClient();
 
@@ -81,7 +81,6 @@ export async function deleteAdminItem(table: string, id: string) {
     if (error) {
         throw new Error(error.message);
     }
-
 
     return true;
 }
@@ -209,4 +208,141 @@ export async function uploadHeroImage(formData: FormData, key: string = 'hero_ba
         .getPublicUrl(fileName);
 
     return publicUrl;
+}
+
+export async function uploadImage(formData: FormData, folder: string = 'ads'): Promise<string> {
+    await ensureAdmin();
+
+    const file = formData.get('file') as File;
+    if (!file) {
+        throw new Error('Nenhum arquivo fornecido');
+    }
+
+    // Validar tipo de arquivo
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+        throw new Error('Formato inválido. Use JPG, PNG ou WebP');
+    }
+
+    // Validar tamanho (máx 5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+        throw new Error('Arquivo muito grande. Máximo 5MB');
+    }
+
+    const supabase = createAdminClient();
+    const timestamp = Date.now();
+    const ext = file.name.split('.').pop();
+    const fileName = `${folder}/${timestamp}-${Math.random().toString(36).substring(7)}.${ext}`;
+
+    const { error } = await supabase.storage
+        .from('media')
+        .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+        });
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+        .from('media')
+        .getPublicUrl(fileName);
+
+    return publicUrl;
+}
+
+export async function getAdvertisements() {
+    const supabase = createAdminClient();
+
+    const { data, error } = await supabase
+        .from('advertisements')
+        .select('*')
+        .order('order_index', { ascending: true });
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return data;
+}
+
+export async function createAdvertisement(data: Record<string, unknown>) {
+    await ensureAdmin();
+    const supabase = createAdminClient();
+
+    // Get max order_index
+    const { data: maxOrder } = await supabase
+        .from('advertisements')
+        .select('order_index')
+        .order('order_index', { ascending: false })
+        .limit(1)
+        .single();
+
+    const newOrderIndex = (maxOrder?.order_index || 0) + 1;
+
+    const { data: newAd, error } = await supabase
+        .from('advertisements')
+        .insert({ ...data, order_index: newOrderIndex })
+        .select()
+        .single();
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return newAd;
+}
+
+export async function updateAdvertisement(id: string, data: Record<string, unknown>) {
+    await ensureAdmin();
+    const supabase = createAdminClient();
+
+    const { error } = await supabase
+        .from('advertisements')
+        .update(data)
+        .eq('id', id);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return true;
+}
+
+export async function deleteAdvertisement(id: string) {
+    await ensureAdmin();
+    const supabase = createAdminClient();
+
+    const { error } = await supabase
+        .from('advertisements')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return true;
+}
+
+export async function reorderAdvertisements(items: { id: string; order_index: number }[]) {
+    await ensureAdmin();
+    const supabase = createAdminClient();
+
+    const updates = items.map((item) =>
+        supabase
+            .from('advertisements')
+            .update({ order_index: item.order_index })
+            .eq('id', item.id)
+    );
+
+    const results = await Promise.all(updates);
+    const failed = results.filter((r) => r.error);
+    if (failed.length > 0) {
+        throw new Error(`Falha ao reordenar ${failed.length} item(s)`);
+    }
+
+    return true;
 }

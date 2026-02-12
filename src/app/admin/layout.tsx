@@ -10,12 +10,12 @@ import {
   Store,
   Briefcase,
   Phone,
-  Car,
   Settings,
   LogOut,
   Menu,
   X,
   MessageSquareText,
+  Megaphone,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -29,6 +29,7 @@ const navItems = [
   { href: '/admin/sugestoes', icon: MessageSquareText, label: 'Sugestões' },
   { href: '/admin/contatos', icon: Phone, label: 'Contatos' },
   { href: '/admin/configuracoes', icon: Settings, label: 'Configurações' },
+  { href: '/admin/banners', icon: Megaphone, label: 'Publicidade' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -69,16 +70,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       router.push('/admin/login');
     } finally {
       setLoading(false);
-    }
-  }
-
-  async function handleLogout() {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      toast.success('Logout realizado');
-      router.push('/admin/login');
-    } catch {
-      toast.error('Erro ao fazer logout');
     }
   }
 

@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { Calendar, Info, MapPin, Music } from 'lucide-react';
+import { Calendar, Info, Music } from 'lucide-react';
 import { motion, type Variants } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
-import { formatDate } from '@/lib/utils';
 import { formatCarnivalDateRangeUppercase } from '@/lib/format-dates';
 import type { Attraction } from '@/types';
+import { Advertisement } from '@/types/advertisement';
+import { CarouselBanner } from '@/components/CarouselBanner';
 import AttractionCard from '@/components/public/AttractionCard';
 import AttractionModal from '@/components/public/AttractionModal';
 
@@ -18,6 +19,7 @@ export default function ProgramacaoPage() {
   const [heroImage, setHeroImage] = useState<string>('https://images.unsplash.com/photo-1514525253440-b393452e233e?q=80&w=1000&auto=format&fit=crop');
   const [selectedAttraction, setSelectedAttraction] = useState<Attraction | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [ads, setAds] = useState<Advertisement[]>([]);
   const tabsRef = useRef<HTMLDivElement>(null);
 
   // Animation Variants
@@ -50,10 +52,11 @@ export default function ProgramacaoPage() {
 
   async function loadSettings() {
     try {
-      const [startRes, endRes, heroRes] = await Promise.all([
+      const [startRes, endRes, heroRes, adsRes] = await Promise.all([
         supabase.from('app_settings').select('value').eq('key', 'carnival_start_date').single(),
         supabase.from('app_settings').select('value').eq('key', 'carnival_end_date').single(),
         supabase.from('app_settings').select('value').eq('key', 'programacao_hero_image').single(),
+        supabase.from('advertisements').select('*').eq('active', true).order('order_index'),
       ]);
 
       if (startRes.data?.value && endRes.data?.value) {
@@ -62,6 +65,10 @@ export default function ProgramacaoPage() {
 
       if (heroRes.data?.value) {
         setHeroImage(heroRes.data.value);
+      }
+
+      if (adsRes.data) {
+        setAds(adsRes.data as Advertisement[]);
       }
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -114,7 +121,7 @@ export default function ProgramacaoPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="px-0 sm:px-4 sm:pt-4 pb-2 max-w-2xl mx-auto"
+        className="px-0 sm:px-4 sm:pt-4 pb-0 sm:pb-2 max-w-2xl mx-auto"
       >
         <div className="relative bg-gradient-to-br from-fuchsia-500 to-pink-600 text-white sm:rounded-xl shadow-xl overflow-hidden">
           {/* Decorative elements */}
@@ -128,22 +135,28 @@ export default function ProgramacaoPage() {
               <Calendar size={24} className="text-white" />
             </div>
             <h1 className="font-display text-3xl mb-2 text-white drop-shadow-md">Programação Oficial</h1>
-            <p className="text-white/80">Todos os eventos e atrações do Carnaval de Paracuru</p>
-
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold mt-4 border border-white/10">
-              <Calendar size={12} />
-              {carnivalDates}
-            </div>
+            <p className="text-white/80">Todas as atrações do Carnaval de Paracuru</p>
           </div>
         </div>
       </motion.section>
+
+      {/* Promotional Banner Carousel */}
+      {ads.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <CarouselBanner ads={ads} />
+        </motion.div>
+      )}
 
       {/* Date Tabs */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.3 }}
-        className="px-4 mt-6 max-w-2xl mx-auto"
+        className="px-4 mt-2 sm:mt-6 max-w-2xl mx-auto"
       >
         <div
           ref={tabsRef}

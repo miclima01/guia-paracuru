@@ -117,6 +117,20 @@ CREATE TABLE app_settings (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Advertisements
+CREATE TABLE advertisements (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  title TEXT NOT NULL,
+  subtitle TEXT,
+  image_url TEXT NOT NULL,
+  link TEXT,
+  button_text TEXT,
+  active BOOLEAN DEFAULT true,
+  order_index INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ============================================
 -- INDEXES
 -- ============================================
@@ -133,6 +147,7 @@ CREATE INDEX idx_payments_device ON payments(device_id);
 CREATE INDEX idx_payments_status ON payments(status);
 CREATE INDEX idx_premium_device ON premium_access(device_id);
 CREATE INDEX idx_premium_expires ON premium_access(expires_at);
+CREATE INDEX idx_advertisements_active ON advertisements(active, order_index);
 
 -- ============================================
 -- ROW LEVEL SECURITY
@@ -146,6 +161,7 @@ ALTER TABLE transport_contacts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE premium_access ENABLE ROW LEVEL SECURITY;
 ALTER TABLE app_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE advertisements ENABLE ROW LEVEL SECURITY;
 
 -- Public read access
 CREATE POLICY "Public read attractions" ON attractions FOR SELECT USING (true);
@@ -154,6 +170,7 @@ CREATE POLICY "Public read businesses" ON businesses FOR SELECT USING (true);
 CREATE POLICY "Public read emergency" ON emergency_contacts FOR SELECT USING (true);
 CREATE POLICY "Public read transport" ON transport_contacts FOR SELECT USING (true);
 CREATE POLICY "Public read settings" ON app_settings FOR SELECT USING (true);
+CREATE POLICY "Public read advertisements" ON advertisements FOR SELECT USING (true);
 
 -- Payments: users can read their own
 CREATE POLICY "Users read own payments" ON payments FOR SELECT USING (true);
@@ -168,6 +185,7 @@ CREATE POLICY "Service full access transport" ON transport_contacts FOR ALL USIN
 CREATE POLICY "Service full access payments" ON payments FOR ALL USING (auth.role() = 'service_role');
 CREATE POLICY "Service full access premium" ON premium_access FOR ALL USING (auth.role() = 'service_role');
 CREATE POLICY "Service full access settings" ON app_settings FOR ALL USING (auth.role() = 'service_role');
+CREATE POLICY "Service full access advertisements" ON advertisements FOR ALL USING (auth.role() = 'service_role');
 
 -- ============================================
 -- FUNCTIONS
@@ -192,6 +210,10 @@ CREATE TRIGGER update_news_updated_at
 
 CREATE TRIGGER update_businesses_updated_at
   BEFORE UPDATE ON businesses
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+CREATE TRIGGER update_advertisements_updated_at
+  BEFORE UPDATE ON advertisements
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 CREATE TRIGGER update_settings_updated_at

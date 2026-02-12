@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { Save, Upload, Calendar, MapPin, DollarSign, Palette, MessageCircle, Crown, Globe, Image as ImageIcon } from 'lucide-react';
+import { Save, Upload, Calendar, MapPin, Palette, MessageCircle, Crown, Image as ImageIcon } from 'lucide-react';
 import { getSettings, saveSettings, uploadHeroImage } from '@/actions/admin-actions';
 import toast from 'react-hot-toast';
 
@@ -65,6 +65,7 @@ const settingsGroups: SettingsGroup[] = [
       // Future: Color scheme, Logo URL, etc.
     ]
   },
+
   {
     id: 'support',
     title: 'Suporte',
@@ -76,7 +77,6 @@ const settingsGroups: SettingsGroup[] = [
   }
 ];
 
-// Force rebuild
 export default function ConfiguracoesPage() {
   const [values, setValues] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
@@ -128,8 +128,8 @@ export default function ConfiguracoesPage() {
       setSelectedFile(null);
       setSelectedSettingKey(null);
       setPreviewUrl(null);
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao enviar imagem');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Erro ao enviar imagem');
     } finally {
       setUploadingImage(false);
     }
@@ -199,7 +199,7 @@ export default function ConfiguracoesPage() {
                       </label>
                     </div>
 
-                    {setting.key.includes('hero_image') || setting.key === 'hero_background_image' ? (
+                    {setting.key.includes('hero_image') ? (
                       <div className="space-y-4 bg-surface-50 p-4 rounded-xl border border-surface-200">
                         {/* Preview Area */}
                         <div className="relative w-full h-48 rounded-lg overflow-hidden bg-surface-200 shadow-inner group">
@@ -248,6 +248,7 @@ export default function ConfiguracoesPage() {
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
                                 if (file) {
+                                  if (previewUrl) URL.revokeObjectURL(previewUrl);
                                   setSelectedFile(file);
                                   setSelectedSettingKey(setting.key);
                                   setPreviewUrl(URL.createObjectURL(file));
