@@ -127,6 +127,7 @@ export default function NewsSlider({ news, supportWhatsapp }: NewsSliderProps) {
                 {Array.from({ length: totalSlides }).map((_, idx) => (
                     <button
                         key={idx}
+                        aria-label={`Ir para o slide ${idx + 1}`}
                         className={`h-1.5 rounded-full transition-all duration-300 pointer-events-auto ${selectedIndex === idx ? 'w-6 bg-white' : 'w-1.5 bg-white/40 hover:bg-white/60'
                             }`}
                         onClick={() => scrollTo(idx)}
