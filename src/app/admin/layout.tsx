@@ -15,6 +15,7 @@ import {
   LogOut,
   Menu,
   X,
+  MessageSquareText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -25,6 +26,7 @@ const navItems = [
   { href: '/admin/noticias', icon: Newspaper, label: 'Notícias' },
   { href: '/admin/estabelecimentos', icon: Store, label: 'Estabelecimentos' },
   { href: '/admin/servicos', icon: Briefcase, label: 'Serviços' },
+  { href: '/admin/sugestoes', icon: MessageSquareText, label: 'Sugestões' },
   { href: '/admin/contatos', icon: Phone, label: 'Contatos' },
   { href: '/admin/configuracoes', icon: Settings, label: 'Configurações' },
 ];

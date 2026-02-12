@@ -147,3 +147,11 @@ export type EmergencyCategory =
   | 'police'
   | 'fire'
   | 'other';
+
+export interface Suggestion {
+  id: string;
+  name?: string;
+  message: string;
+  status: 'unread' | 'read';
+  created_at: string;
+}

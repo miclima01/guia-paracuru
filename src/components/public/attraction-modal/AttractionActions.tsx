@@ -50,7 +50,7 @@ export function AttractionActions({ attraction }: AttractionActionsProps) {
                         className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-red-500 text-white text-sm font-bold shadow-md hover:shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 group"
                     >
                         <InstagramIcon className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                        <span>Ver no Instagram</span>
+                        <span>Instagram</span>
                         <ExternalLink size={14} className="opacity-70" />
                     </a>
                 )}
