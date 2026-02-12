@@ -12,6 +12,10 @@
     @apply border-surface-200;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-surface-50 text-surface-900 antialiased;
   }
