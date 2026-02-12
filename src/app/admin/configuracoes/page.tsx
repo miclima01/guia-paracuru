@@ -260,7 +260,11 @@ export default function ConfiguracoesPage() {
                               htmlFor={`upload-${setting.key}`}
                               className="flex-1 btn-secondary text-sm py-2 cursor-pointer text-center"
                             >
-                              {selectedSettingKey === setting.key && selectedFile ? selectedFile.name : 'Escolher Arquivo'}
+                              {selectedSettingKey === setting.key && selectedFile ? (
+                                selectedFile.name.length > 25
+                                  ? selectedFile.name.substring(0, 15) + '...' + selectedFile.name.substring(selectedFile.name.length - 7)
+                                  : selectedFile.name
+                              ) : 'Escolher Arquivo'}
                             </label>
 
                             {selectedSettingKey === setting.key && selectedFile && (
