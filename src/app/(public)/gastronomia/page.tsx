@@ -62,13 +62,14 @@ export default function GastronomiaPage() {
     return (
         <div className="min-h-screen pb-20">
             {/* Header */}
-            <section className="px-4 pt-4 pb-2 max-w-2xl mx-auto">
-                <div className="bg-gradient-to-br from-orange-400 to-orange-600 text-white rounded-xl shadow-xl">
+            {/* Header */}
+            <section className="px-0 sm:px-4 sm:pt-4 pb-2 max-w-2xl mx-auto">
+                <div className="bg-gradient-to-br from-orange-400 to-orange-600 text-white sm:rounded-xl shadow-xl">
                     <div className="px-5 pt-8 pb-6 text-center">
                         <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/20 mb-4 backdrop-blur-sm">
-                            <Beer size={24} />
+                            <Beer size={24} className="text-white" />
                         </div>
-                        <h1 className="font-display text-3xl mb-2">Gastronomia</h1>
+                        <h1 className="font-display text-3xl mb-2 text-white">Gastronomia</h1>
                         <p className="text-white/80">Onde comer e beber no Carnaval</p>
                     </div>
                 </div>

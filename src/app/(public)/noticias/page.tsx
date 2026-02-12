@@ -82,14 +82,8 @@ export default function NoticiasPage() {
       >
         <div className="bg-gradient-to-br from-rose-700 to-rose-900 noise sm:rounded-xl shadow-xl">
           <div className="px-5 pt-8 pb-6 text-center">
-            <div className="flex justify-center mb-4">
-              <Image
-                src="/logo-cnp.png"
-                alt="Logo CNP"
-                width={150}
-                height={150}
-                className="object-contain drop-shadow-sm"
-              />
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/20 mb-4 backdrop-blur-sm">
+              <Newspaper size={24} className="text-white" />
             </div>
             <h1 className="font-display text-3xl mb-2 text-white">Notícias</h1>
             <p className="text-white/80">Fique por dentro de tudo</p>

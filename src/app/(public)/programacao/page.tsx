@@ -118,13 +118,8 @@ export default function ProgramacaoPage() {
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/20 mb-4 backdrop-blur-sm">
               <Calendar size={24} className="text-white" />
             </div>
-            <h1 className="font-display text-3xl mb-2 text-white drop-shadow-md">Programação Oficial</h1>
-            <p className="text-white/80">Todos os eventos e atrações do Carnaval de Paracuru</p>
-
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold mt-4 border border-white/10">
-              <Calendar size={12} />
-              {carnivalDates}
-            </div>
+            <h1 className="font-display text-3xl mb-2 text-white drop-shadow-md">Programação</h1>
+            <p className="text-white/80">Todos os eventos do Carnaval</p>
           </div>
         </div>
       </motion.section>
