@@ -1,4 +1,4 @@
-import { BusinessCategory, NewsCategory } from '@/types';
+import { BusinessCategory, NewsCategory, ServiceCategory } from '@/types';
 
 // Date formatting
 export function formatDateTime(date: string | Date): string {
@@ -25,6 +25,15 @@ export function formatTime(time: string): string {
   return time.substring(0, 5);
 }
 
+export function formatDateWithWeekday(dateStr: string): string {
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric'
+  });
+}
+
 // Currency formatting
 export function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('pt-BR', {
@@ -46,6 +55,14 @@ export const CATEGORY_LABELS: Record<BusinessCategory, string> = {
   hospital: 'Hospital',
   health_post: 'Posto de Saúde',
   other: 'Outro',
+};
+
+export const SERVICE_CATEGORY_LABELS: Record<ServiceCategory, string> = {
+  pousada: 'Pousada',
+  hotel: 'Hotel',
+  hospital: 'Hospital',
+  pharmacy: 'Farmácia',
+  market: 'Mercado',
 };
 
 export const NEWS_CATEGORY_LABELS: Record<NewsCategory, string> = {

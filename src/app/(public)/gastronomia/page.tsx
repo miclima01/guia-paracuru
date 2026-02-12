@@ -8,6 +8,10 @@ import type { Business, BusinessCategory } from '@/types';
 import { CATEGORY_LABELS } from '@/lib/utils';
 import EstablishmentModal from '@/components/public/EstablishmentModal';
 
+function getCategoryLabel(category: string): string {
+    return CATEGORY_LABELS[category as BusinessCategory] || category;
+}
+
 export default function GastronomiaPage() {
     const [businesses, setBusinesses] = useState<Business[]>([]);
     const [loading, setLoading] = useState(true);
@@ -15,31 +19,30 @@ export default function GastronomiaPage() {
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const categories: { id: string; label: string }[] = [
+    const [categories, setCategories] = useState<{ id: string; label: string }[]>([
         { id: 'all', label: 'Todos' },
-        { id: 'restaurant', label: 'Restaurantes' },
-        { id: 'bar', label: 'Bares' },
-        { id: 'beach_club', label: 'Barracas' },
-        { id: 'hotel', label: 'Hotéis' },
-        { id: 'pousada', label: 'Pousadas' },
-        { id: 'pharmacy', label: 'Farmácias' },
-        { id: 'market', label: 'Mercados' },
-        { id: 'gas_station', label: 'Postos' },
-        { id: 'other', label: 'Outros' },
-    ];
+    ]);
 
     useEffect(() => {
         async function loadBusinesses() {
             try {
-                let query = supabase
+                const { data } = await supabase
                     .from('businesses')
-                    .select('id,name,description,category,address,phone,whatsapp,instagram,website,image_url,latitude,longitude,is_partner,is_premium,is_featured')
+                    .select('*')
                     .order('is_featured', { ascending: false })
                     .order('name');
 
-                const { data } = await query;
-                if (data) setBusinesses(data as Business[]);
+                if (data) {
+                    setBusinesses(data as Business[]);
+                    // Always show predefined categories + any custom ones from data
+                    const customCats = [...new Set(data.map((b: Business) => b.category))]
+                        .filter(cat => !(cat in CATEGORY_LABELS));
+                    setCategories([
+                        { id: 'all', label: 'Todos' },
+                        ...Object.entries(CATEGORY_LABELS).map(([id, label]) => ({ id, label })),
+                        ...customCats.map(cat => ({ id: cat, label: cat })),
+                    ]);
+                }
             } catch (error) {
                 console.error('Erro ao carregar locais:', error);
             } finally {
@@ -132,7 +135,7 @@ export default function GastronomiaPage() {
                                         </span>
                                     )}
                                     <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-sm text-white text-[10px] font-medium border border-white/20">
-                                        {CATEGORY_LABELS[biz.category as BusinessCategory]}
+                                        {getCategoryLabel(biz.category)}
                                     </span>
                                 </div>
                                 <div className="p-4">

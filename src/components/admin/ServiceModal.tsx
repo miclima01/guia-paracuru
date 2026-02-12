@@ -1,25 +1,25 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Save, Upload, MapPin, Loader2, Image as ImageIcon, Plus, MessageCircle, AtSign, Globe, Phone, Star, ShieldCheck, Tag } from 'lucide-react';
-import type { Business } from '@/types';
-import { CATEGORY_LABELS } from '@/lib/utils';
+import { X, Save, Upload, MapPin, Loader2, Image as ImageIcon, Plus, Trash2, MessageCircle, AtSign, Star, Tag } from 'lucide-react';
+import type { Service } from '@/types';
+import { SERVICE_CATEGORY_LABELS } from '@/lib/utils';
 import { uploadImage, supabase } from '@/lib/supabase';
 import toast from 'react-hot-toast';
 
-interface EstablishmentModalProps {
+interface ServiceModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (data: Partial<Business>) => Promise<void>;
-    initialData?: Business;
+    onSave: (data: Partial<Service>) => Promise<void>;
+    initialData?: Service;
 }
 
-export default function EstablishmentModal({
+export default function ServiceModal({
     isOpen,
     onClose,
     onSave,
     initialData,
-}: EstablishmentModalProps) {
+}: ServiceModalProps) {
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [isAddingCategory, setIsAddingCategory] = useState(false);
@@ -28,39 +28,35 @@ export default function EstablishmentModal({
     const fileInputRef = useRef<HTMLInputElement>(null);
     const newCatRef = useRef<HTMLInputElement>(null);
 
-    const [formData, setFormData] = useState<Partial<Business>>({
+    const [formData, setFormData] = useState<Partial<Service>>({
         name: '',
         description: '',
-        category: 'restaurant',
+        category: 'pousada',
         address: '',
-        phone: '',
-        whatsapp: '',
-        instagram: '',
-        website: '',
-        image_url: '',
         latitude: null,
         longitude: null,
-        is_partner: false,
-        is_premium: false,
+        instagram: '',
+        whatsapp: '',
+        image_url: '',
         is_featured: false,
         order_index: 0,
     });
 
     const allCategories: Record<string, string> = {
-        ...CATEGORY_LABELS,
+        ...SERVICE_CATEGORY_LABELS,
         ...extraCategories,
     };
 
-    // Load custom categories from DB
+    // Load existing categories from DB to detect custom ones
     useEffect(() => {
         async function loadCategories() {
             const { data } = await supabase
-                .from('businesses')
+                .from('services')
                 .select('category');
             if (data) {
                 const custom: Record<string, string> = {};
                 data.forEach((row: { category: string }) => {
-                    if (!(row.category in CATEGORY_LABELS) && row.category) {
+                    if (!(row.category in SERVICE_CATEGORY_LABELS) && row.category) {
                         custom[row.category] = row.category;
                     }
                 });
@@ -77,17 +73,13 @@ export default function EstablishmentModal({
             setFormData({
                 name: '',
                 description: '',
-                category: 'restaurant',
+                category: 'pousada',
                 address: '',
-                phone: '',
-                whatsapp: '',
-                instagram: '',
-                website: '',
-                image_url: '',
                 latitude: null,
                 longitude: null,
-                is_partner: false,
-                is_premium: false,
+                instagram: '',
+                whatsapp: '',
+                image_url: '',
                 is_featured: false,
                 order_index: 0,
             });
@@ -108,17 +100,24 @@ export default function EstablishmentModal({
         e.preventDefault();
         setLoading(true);
         try {
-            await onSave(formData);
+            await onSave({
+                ...formData,
+                latitude: formData.latitude || null,
+                longitude: formData.longitude || null,
+                image_url: formData.image_url || null,
+                instagram: formData.instagram || null,
+                whatsapp: formData.whatsapp || null,
+            });
             onClose();
         } catch (error) {
-            console.error('Error saving establishment:', error);
-            alert('Erro ao salvar estabelecimento');
+            console.error('Error saving service:', error);
+            alert('Erro ao salvar serviço');
         } finally {
             setLoading(false);
         }
     }
 
-    const handleChange = (field: keyof Business, value: any) => {
+    const handleChange = (field: keyof Service, value: any) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
@@ -151,13 +150,14 @@ export default function EstablishmentModal({
     }
 
     async function deleteCategory(slug: string) {
+        // Check if any services use this category
         const { count } = await supabase
-            .from('businesses')
+            .from('services')
             .select('id', { count: 'exact', head: true })
             .eq('category', slug);
 
         if (count && count > 0) {
-            toast.error(`Não é possível excluir: ${count} estabelecimento(s) usa(m) esta categoria.`);
+            toast.error(`Não é possível excluir: ${count} serviço(s) usa(m) esta categoria.`);
             return;
         }
 
@@ -167,14 +167,15 @@ export default function EstablishmentModal({
             return next;
         });
 
+        // If the deleted category was selected, reset to first available
         if (formData.category === slug) {
-            handleChange('category', Object.keys(CATEGORY_LABELS)[0]);
+            handleChange('category', Object.keys(SERVICE_CATEGORY_LABELS)[0]);
         }
 
         toast.success('Categoria removida.');
     }
 
-    const isCustom = (slug: string) => !(slug in CATEGORY_LABELS);
+    const isCustom = (slug: string) => !(slug in SERVICE_CATEGORY_LABELS);
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -183,9 +184,9 @@ export default function EstablishmentModal({
                 <div className="flex items-center justify-between p-5 border-b border-surface-100 sticky top-0 bg-white z-10 rounded-t-2xl">
                     <div>
                         <h2 className="text-lg font-bold text-surface-900">
-                            {initialData ? 'Editar Estabelecimento' : 'Novo Estabelecimento'}
+                            {initialData ? 'Editar Serviço' : 'Novo Serviço'}
                         </h2>
-                        <p className="text-xs text-surface-400 mt-0.5">Preencha as informações do estabelecimento</p>
+                        <p className="text-xs text-surface-400 mt-0.5">Preencha as informações do serviço</p>
                     </div>
                     <button
                         onClick={onClose}
@@ -196,10 +197,10 @@ export default function EstablishmentModal({
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-5 space-y-5">
-                    {/* Image */}
+                    {/* Image - Top prominent */}
                     <div
                         onClick={() => fileInputRef.current?.click()}
-                        className="relative h-40 w-full rounded-xl overflow-hidden bg-surface-50 border-2 border-dashed border-surface-200 hover:border-carnival-300 hover:bg-orange-50/30 transition-all cursor-pointer group"
+                        className="relative h-40 w-full rounded-xl overflow-hidden bg-surface-50 border-2 border-dashed border-surface-200 hover:border-emerald-300 hover:bg-emerald-50/30 transition-all cursor-pointer group"
                     >
                         {formData.image_url ? (
                             <>
@@ -213,7 +214,7 @@ export default function EstablishmentModal({
                         ) : (
                             <div className="flex flex-col items-center justify-center h-full text-surface-400">
                                 <div className="bg-surface-100 p-3 rounded-full mb-2 group-hover:bg-white transition-colors">
-                                    <ImageIcon size={24} className="text-surface-400 group-hover:text-carnival-500 transition-colors" />
+                                    <ImageIcon size={24} className="text-surface-400 group-hover:text-emerald-500 transition-colors" />
                                 </div>
                                 <p className="text-sm font-medium">Clique para adicionar imagem</p>
                                 <p className="text-[10px] text-surface-400">JPG, PNG ou WEBP</p>
@@ -221,7 +222,7 @@ export default function EstablishmentModal({
                         )}
                         {uploading && (
                             <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-10">
-                                <Loader2 size={28} className="text-carnival-500 animate-spin mb-2" />
+                                <Loader2 size={28} className="text-emerald-500 animate-spin mb-2" />
                                 <p className="text-xs font-medium text-surface-600">Enviando...</p>
                             </div>
                         )}
@@ -234,7 +235,7 @@ export default function EstablishmentModal({
                             type="url"
                             value={formData.image_url || ''}
                             onChange={(e) => handleChange('image_url', e.target.value)}
-                            className="w-full pl-9 pr-4 py-2 rounded-lg border border-surface-200 focus:border-carnival-500 focus:ring-2 focus:ring-carnival-100 outline-none transition-all text-sm"
+                            className="w-full pl-9 pr-4 py-2 rounded-lg border border-surface-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all text-sm"
                             placeholder="Ou cole a URL da imagem..."
                         />
                         <ImageIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-400" />
@@ -243,19 +244,19 @@ export default function EstablishmentModal({
                     {/* Name */}
                     <div>
                         <label className="block text-xs font-semibold text-surface-500 uppercase tracking-wide mb-1.5">
-                            Nome do Estabelecimento *
+                            Nome *
                         </label>
                         <input
                             type="text"
                             required
                             value={formData.name || ''}
                             onChange={(e) => handleChange('name', e.target.value)}
-                            className="w-full px-4 py-2.5 rounded-xl border border-surface-200 focus:border-carnival-500 focus:ring-2 focus:ring-carnival-100 outline-none transition-all text-sm"
-                            placeholder="Ex: Restaurante Sabor do Mar"
+                            className="w-full px-4 py-2.5 rounded-xl border border-surface-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all text-sm"
+                            placeholder="Ex: Pousada Sol Nascente"
                         />
                     </div>
 
-                    {/* Category pills */}
+                    {/* Category section */}
                     <div>
                         <label className="flex items-center gap-1.5 text-xs font-semibold text-surface-500 uppercase tracking-wide mb-2">
                             <Tag size={12} /> Categoria *
@@ -267,8 +268,8 @@ export default function EstablishmentModal({
                                         type="button"
                                         onClick={() => handleChange('category', slug)}
                                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${formData.category === slug
-                                            ? 'bg-carnival-500 text-white border-carnival-500 shadow-sm'
-                                            : 'bg-white text-surface-600 border-surface-200 hover:border-carnival-300 hover:text-carnival-700'
+                                            ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm'
+                                            : 'bg-white text-surface-600 border-surface-200 hover:border-emerald-300 hover:text-emerald-700'
                                             } ${isCustom(slug) ? 'pr-7' : ''}`}
                                     >
                                         {label}
@@ -276,7 +277,10 @@ export default function EstablishmentModal({
                                     {isCustom(slug) && (
                                         <button
                                             type="button"
-                                            onClick={(e) => { e.stopPropagation(); deleteCategory(slug); }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                deleteCategory(slug);
+                                            }}
                                             className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover/cat:opacity-100 transition-opacity shadow-sm hover:bg-red-600"
                                             title="Excluir categoria"
                                         >
@@ -286,6 +290,7 @@ export default function EstablishmentModal({
                                 </div>
                             ))}
 
+                            {/* Add new */}
                             {isAddingCategory ? (
                                 <div className="flex items-center gap-1.5">
                                     <input
@@ -297,13 +302,21 @@ export default function EstablishmentModal({
                                             if (e.key === 'Enter') { e.preventDefault(); addCategory(); }
                                             if (e.key === 'Escape') { setIsAddingCategory(false); setNewCategoryName(''); }
                                         }}
-                                        className="px-3 py-1.5 rounded-lg text-xs border border-carnival-300 focus:border-carnival-500 focus:ring-2 focus:ring-carnival-100 outline-none w-32"
+                                        className="px-3 py-1.5 rounded-lg text-xs border border-emerald-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none w-32"
                                         placeholder="Nova categoria"
                                     />
-                                    <button type="button" onClick={addCategory} className="p-1.5 rounded-lg bg-carnival-500 text-white hover:bg-carnival-600 transition-colors">
+                                    <button
+                                        type="button"
+                                        onClick={addCategory}
+                                        className="p-1.5 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors"
+                                    >
                                         <Plus size={12} />
                                     </button>
-                                    <button type="button" onClick={() => { setIsAddingCategory(false); setNewCategoryName(''); }} className="p-1.5 rounded-lg bg-surface-100 text-surface-500 hover:bg-surface-200 transition-colors">
+                                    <button
+                                        type="button"
+                                        onClick={() => { setIsAddingCategory(false); setNewCategoryName(''); }}
+                                        className="p-1.5 rounded-lg bg-surface-100 text-surface-500 hover:bg-surface-200 transition-colors"
+                                    >
                                         <X size={12} />
                                     </button>
                                 </div>
@@ -311,7 +324,7 @@ export default function EstablishmentModal({
                                 <button
                                     type="button"
                                     onClick={() => setIsAddingCategory(true)}
-                                    className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-dashed border-surface-300 text-surface-400 hover:border-carnival-400 hover:text-carnival-600 hover:bg-orange-50 transition-all flex items-center gap-1"
+                                    className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-dashed border-surface-300 text-surface-400 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all flex items-center gap-1"
                                 >
                                     <Plus size={12} /> Nova
                                 </button>
@@ -328,25 +341,13 @@ export default function EstablishmentModal({
                             rows={2}
                             value={formData.description || ''}
                             onChange={(e) => handleChange('description', e.target.value)}
-                            className="w-full px-4 py-2.5 rounded-xl border border-surface-200 focus:border-carnival-500 focus:ring-2 focus:ring-carnival-100 outline-none transition-all text-sm resize-none"
-                            placeholder="Fale um pouco sobre o estabelecimento..."
+                            className="w-full px-4 py-2.5 rounded-xl border border-surface-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all text-sm resize-none"
+                            placeholder="Fale um pouco sobre o serviço..."
                         />
                     </div>
 
-                    {/* Contact & Social */}
+                    {/* Social & Contact */}
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="flex items-center gap-1.5 text-xs font-semibold text-surface-500 uppercase tracking-wide mb-1.5">
-                                <Phone size={12} /> Telefone
-                            </label>
-                            <input
-                                type="tel"
-                                value={formData.phone || ''}
-                                onChange={(e) => handleChange('phone', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-xl border border-surface-200 focus:border-carnival-500 focus:ring-2 focus:ring-carnival-100 outline-none transition-all text-sm"
-                                placeholder="(85) 99999-9999"
-                            />
-                        </div>
                         <div>
                             <label className="flex items-center gap-1.5 text-xs font-semibold text-surface-500 uppercase tracking-wide mb-1.5">
                                 <MessageCircle size={12} /> WhatsApp
@@ -355,7 +356,7 @@ export default function EstablishmentModal({
                                 type="tel"
                                 value={formData.whatsapp || ''}
                                 onChange={(e) => handleChange('whatsapp', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-xl border border-surface-200 focus:border-carnival-500 focus:ring-2 focus:ring-carnival-100 outline-none transition-all text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl border border-surface-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all text-sm"
                                 placeholder="85999999999"
                             />
                         </div>
@@ -367,39 +368,10 @@ export default function EstablishmentModal({
                                 type="text"
                                 value={formData.instagram || ''}
                                 onChange={(e) => handleChange('instagram', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-xl border border-surface-200 focus:border-carnival-500 focus:ring-2 focus:ring-carnival-100 outline-none transition-all text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl border border-surface-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all text-sm"
                                 placeholder="@usuario"
                             />
                         </div>
-                        <div>
-                            <label className="flex items-center gap-1.5 text-xs font-semibold text-surface-500 uppercase tracking-wide mb-1.5">
-                                <Globe size={12} /> Website
-                            </label>
-                            <input
-                                type="url"
-                                value={formData.website || ''}
-                                onChange={(e) => handleChange('website', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-xl border border-surface-200 focus:border-carnival-500 focus:ring-2 focus:ring-carnival-100 outline-none transition-all text-sm"
-                                placeholder="https://..."
-                            />
-                        </div>
-                    </div>
-
-                    {/* Rating */}
-                    <div className="w-32">
-                        <label className="flex items-center gap-1.5 text-xs font-semibold text-surface-500 uppercase tracking-wide mb-1.5">
-                            <Star size={12} /> Nota (0-5)
-                        </label>
-                        <input
-                            type="number"
-                            min="0"
-                            max="5"
-                            step="0.1"
-                            value={formData.rating || ''}
-                            onChange={(e) => handleChange('rating', parseFloat(e.target.value))}
-                            className="w-full px-4 py-2.5 rounded-xl border border-surface-200 focus:border-carnival-500 focus:ring-2 focus:ring-carnival-100 outline-none transition-all text-sm"
-                            placeholder="4.8"
-                        />
                     </div>
 
                     {/* Address & Location */}
@@ -411,7 +383,7 @@ export default function EstablishmentModal({
                             type="text"
                             value={formData.address || ''}
                             onChange={(e) => handleChange('address', e.target.value)}
-                            className="w-full px-4 py-2.5 rounded-xl border border-surface-200 bg-white focus:border-carnival-500 focus:ring-2 focus:ring-carnival-100 outline-none transition-all text-sm"
+                            className="w-full px-4 py-2.5 rounded-xl border border-surface-200 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all text-sm"
                             placeholder="Endereço completo"
                         />
                         <div className="grid grid-cols-2 gap-3">
@@ -420,7 +392,7 @@ export default function EstablishmentModal({
                                 step="any"
                                 value={formData.latitude ?? ''}
                                 onChange={(e) => handleChange('latitude', e.target.value ? parseFloat(e.target.value) : null)}
-                                className="w-full px-4 py-2.5 rounded-xl border border-surface-200 bg-white focus:border-carnival-500 focus:ring-2 focus:ring-carnival-100 outline-none transition-all text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl border border-surface-200 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all text-sm"
                                 placeholder="Latitude: -3.4049"
                             />
                             <input
@@ -428,41 +400,26 @@ export default function EstablishmentModal({
                                 step="any"
                                 value={formData.longitude ?? ''}
                                 onChange={(e) => handleChange('longitude', e.target.value ? parseFloat(e.target.value) : null)}
-                                className="w-full px-4 py-2.5 rounded-xl border border-surface-200 bg-white focus:border-carnival-500 focus:ring-2 focus:ring-carnival-100 outline-none transition-all text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl border border-surface-200 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all text-sm"
                                 placeholder="Longitude: -39.0114"
                             />
                         </div>
                     </div>
 
-                    {/* Flags */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <label className="flex items-center gap-3 p-3 rounded-xl border border-surface-200 hover:border-carnival-300 transition-colors cursor-pointer select-none">
-                            <input
-                                type="checkbox"
-                                checked={formData.is_partner || false}
-                                onChange={(e) => handleChange('is_partner', e.target.checked)}
-                                className="w-4 h-4 text-carnival-600 rounded border-surface-300 focus:ring-carnival-500"
-                            />
-                            <ShieldCheck size={16} className="text-carnival-500" />
-                            <div>
-                                <p className="text-sm font-semibold text-surface-700">Parceiro</p>
-                                <p className="text-[10px] text-surface-400">Verificado pelo Guia</p>
-                            </div>
-                        </label>
-                        <label className="flex items-center gap-3 p-3 rounded-xl border border-surface-200 hover:border-amber-300 transition-colors cursor-pointer select-none">
-                            <input
-                                type="checkbox"
-                                checked={formData.is_featured || false}
-                                onChange={(e) => handleChange('is_featured', e.target.checked)}
-                                className="w-4 h-4 text-amber-500 rounded border-surface-300 focus:ring-amber-500"
-                            />
-                            <Star size={16} className="text-amber-500" />
-                            <div>
-                                <p className="text-sm font-semibold text-surface-700">Destaque</p>
-                                <p className="text-[10px] text-surface-400">Exibir no topo</p>
-                            </div>
-                        </label>
-                    </div>
+                    {/* Featured toggle */}
+                    <label className="flex items-center gap-3 p-3 rounded-xl border border-surface-200 hover:border-amber-300 transition-colors cursor-pointer select-none">
+                        <input
+                            type="checkbox"
+                            checked={formData.is_featured || false}
+                            onChange={(e) => handleChange('is_featured', e.target.checked)}
+                            className="w-4 h-4 text-amber-500 rounded border-surface-300 focus:ring-amber-500"
+                        />
+                        <Star size={16} className="text-amber-500" />
+                        <div>
+                            <p className="text-sm font-semibold text-surface-700">Destaque</p>
+                            <p className="text-[10px] text-surface-400">Exibir no topo da listagem</p>
+                        </div>
+                    </label>
 
                     {/* Footer */}
                     <div className="flex items-center justify-end gap-3 pt-3 border-t border-surface-100">
@@ -476,14 +433,14 @@ export default function EstablishmentModal({
                         <button
                             type="submit"
                             disabled={loading || uploading}
-                            className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-carnival-500 hover:bg-carnival-600 active:bg-carnival-700 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                            className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                         >
                             {(loading || uploading) ? (
                                 <Loader2 size={16} className="animate-spin" />
                             ) : (
                                 <Save size={16} />
                             )}
-                            {loading ? 'Salvando...' : 'Salvar Estabelecimento'}
+                            {loading ? 'Salvando...' : 'Salvar Serviço'}
                         </button>
                     </div>
                 </form>

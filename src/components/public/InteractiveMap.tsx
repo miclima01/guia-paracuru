@@ -5,8 +5,32 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapPin, Star, Navigation, MessageCircle } from 'lucide-react';
-import { CATEGORY_LABELS } from '@/lib/utils';
-import type { Business, BusinessCategory } from '@/types';
+import { CATEGORY_LABELS, SERVICE_CATEGORY_LABELS } from '@/lib/utils';
+import type { BusinessCategory, ServiceCategory } from '@/types';
+
+export interface MapMarker {
+  id: string;
+  name: string;
+  description?: string | null;
+  category: string;
+  address?: string | null;
+  phone?: string | null;
+  whatsapp?: string | null;
+  instagram?: string | null;
+  image_url?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  is_partner?: boolean;
+  is_featured?: boolean;
+  source: 'business' | 'service';
+}
+
+function getMarkerLabel(marker: MapMarker): string {
+  if (marker.source === 'service') {
+    return SERVICE_CATEGORY_LABELS[marker.category as ServiceCategory] || marker.category;
+  }
+  return CATEGORY_LABELS[marker.category as BusinessCategory] || marker.category;
+}
 
 // Fix default marker icons (Leaflet + webpack issue)
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -68,32 +92,32 @@ function createCategoryIcon(category: string) {
   });
 }
 
-// Component to fit bounds when businesses change
-function FitBounds({ businesses }: { businesses: Business[] }) {
+// Component to fit bounds when markers change
+function FitBounds({ markers }: { markers: MapMarker[] }) {
   const map = useMap();
   const initRef = useRef(false);
 
   useEffect(() => {
-    if (businesses.length > 0 && !initRef.current) {
+    if (markers.length > 0 && !initRef.current) {
       const bounds = L.latLngBounds(
-        businesses.map((b) => [b.latitude!, b.longitude!] as [number, number])
+        markers.map((b) => [b.latitude!, b.longitude!] as [number, number])
       );
       if (bounds.isValid()) {
         map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 });
         initRef.current = true;
       }
     }
-  }, [businesses, map]);
+  }, [markers, map]);
 
   return null;
 }
 
 interface InteractiveMapProps {
-  businesses: Business[];
+  markers: MapMarker[];
 }
 
-export default function InteractiveMap({ businesses }: InteractiveMapProps) {
-  const mappable = businesses.filter(
+export default function InteractiveMap({ markers }: InteractiveMapProps) {
+  const mappable = markers.filter(
     (b) => b.latitude != null && b.longitude != null
   );
 
@@ -114,31 +138,36 @@ export default function InteractiveMap({ businesses }: InteractiveMapProps) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <FitBounds businesses={mappable} />
+        <FitBounds markers={mappable} />
 
-        {mappable.map((biz) => (
+        {mappable.map((item) => (
           <Marker
-            key={biz.id}
-            position={[biz.latitude!, biz.longitude!]}
-            icon={createCategoryIcon(biz.category)}
+            key={`${item.source}-${item.id}`}
+            position={[item.latitude!, item.longitude!]}
+            icon={createCategoryIcon(item.category)}
           >
             <Popup maxWidth={280} minWidth={240}>
               <div className="font-sans -mx-2 -my-1">
-                {biz.image_url && (
+                {item.image_url && (
                   <div className="h-28 -mt-1 -mx-0 mb-2 overflow-hidden rounded-lg">
                     <img
-                      src={biz.image_url}
-                      alt={biz.name}
+                      src={item.image_url}
+                      alt={item.name}
                       className="w-full h-full object-cover"
                     />
                   </div>
                 )}
 
                 <div className="flex flex-wrap items-center gap-1 mb-1.5">
-                  <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700">
-                    {CATEGORY_LABELS[biz.category as BusinessCategory] || biz.category}
+                  <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${item.source === 'service' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                    {getMarkerLabel(item)}
                   </span>
-                  {biz.is_partner && (
+                  {item.source === 'service' && (
+                    <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600">
+                      Serviço
+                    </span>
+                  )}
+                  {item.is_partner && (
                     <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">
                       Parceiro
                     </span>
@@ -146,31 +175,31 @@ export default function InteractiveMap({ businesses }: InteractiveMapProps) {
                 </div>
 
                 <h3 className="font-bold text-sm text-gray-900 leading-tight">
-                  {biz.name}
+                  {item.name}
                 </h3>
 
-                {biz.description && (
+                {item.description && (
                   <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                    {biz.description}
+                    {item.description}
                   </p>
                 )}
 
-                {biz.address && (
+                {item.address && (
                   <p className="text-xs text-gray-400 mt-1.5 flex items-start gap-1">
                     <MapPin size={12} className="shrink-0 mt-0.5" />
-                    {biz.address}
+                    {item.address}
                   </p>
                 )}
 
-                {biz.phone && (
+                {item.phone && (
                   <p className="text-xs text-gray-500 mt-1">
-                    <a href={`tel:${biz.phone}`} className="text-blue-600 font-medium">
-                      {biz.phone}
+                    <a href={`tel:${item.phone}`} className="text-blue-600 font-medium">
+                      {item.phone}
                     </a>
                   </p>
                 )}
 
-                {biz.is_partner && (
+                {item.is_partner && (
                   <div className="flex gap-0.5 mt-1.5">
                     {[1, 2, 3, 4, 5].map((i) => (
                       <Star key={i} size={12} className="text-amber-400 fill-amber-400" />
@@ -179,9 +208,9 @@ export default function InteractiveMap({ businesses }: InteractiveMapProps) {
                 )}
 
                 <div className="flex gap-2 mt-3">
-                  {(biz.whatsapp || biz.phone) && (
+                  {(item.whatsapp || item.phone) && (
                     <a
-                      href={`https://wa.me/55${(biz.whatsapp || biz.phone || '').replace(/\D/g, '')}`}
+                      href={`https://wa.me/55${(item.whatsapp || item.phone || '').replace(/\D/g, '')}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-1.5 flex-1 py-2.5 rounded-xl text-xs font-bold no-underline"
@@ -192,7 +221,7 @@ export default function InteractiveMap({ businesses }: InteractiveMapProps) {
                     </a>
                   )}
                   <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${biz.latitude},${biz.longitude}`}
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${item.latitude},${item.longitude}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-1.5 flex-1 py-2.5 rounded-xl text-xs font-bold no-underline"

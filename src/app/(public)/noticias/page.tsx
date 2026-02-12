@@ -1,16 +1,48 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { motion, type Variants } from 'framer-motion';
 import { Newspaper, Star, Instagram, ExternalLink } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { formatDateTime, NEWS_CATEGORY_LABELS } from '@/lib/utils';
 import type { NewsArticle, NewsCategory } from '@/types';
 
+function getCategoryLabel(category: string): string {
+  return NEWS_CATEGORY_LABELS[category as NewsCategory] || category;
+}
+
 export default function NoticiasPage() {
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [categories, setCategories] = useState<{ id: string; label: string }[]>([
+    { id: 'all', label: 'Todas' },
+  ]);
+
+  // Animation Variants
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants: Variants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100
+      }
+    }
+  };
 
   useEffect(() => {
     loadNews();
@@ -19,14 +51,21 @@ export default function NoticiasPage() {
   async function loadNews() {
     const { data } = await supabase
       .from('news')
-      .select('id,title,summary,image_url,category,is_featured,published_at')
+      .select('*')
       .order('published_at', { ascending: false });
 
-    if (data) setNews(data as NewsArticle[]);
+    if (data) {
+      setNews(data as NewsArticle[]);
+      const customCats = [...new Set(data.map((n: NewsArticle) => n.category))]
+        .filter(cat => !(cat in NEWS_CATEGORY_LABELS));
+      setCategories([
+        { id: 'all', label: 'Todas' },
+        ...Object.entries(NEWS_CATEGORY_LABELS).map(([id, label]) => ({ id, label })),
+        ...customCats.map(cat => ({ id: cat, label: cat })),
+      ]);
+    }
     setLoading(false);
   }
-
-  const categories = ['all', ...Object.keys(NEWS_CATEGORY_LABELS)] as const;
   const filteredNews =
     selectedCategory === 'all'
       ? news
@@ -35,44 +74,51 @@ export default function NoticiasPage() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <section className="px-4 pt-4 pb-2 max-w-2xl mx-auto">
-        <div className="bg-gradient-to-br from-violet-500 to-purple-700 noise rounded-xl shadow-xl">
+      <motion.section
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="px-4 pt-4 pb-2 max-w-2xl mx-auto"
+      >
+        <div className="bg-gradient-to-br from-rose-700 to-rose-900 noise rounded-xl shadow-xl">
           <div className="px-5 pt-8 pb-6 text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/20 mb-4 backdrop-blur-sm">
-              <Newspaper size={24} className="text-white" />
+            <div className="flex justify-center mb-4">
+              <Image
+                src="/logo-cnp.png"
+                alt="Logo CNP"
+                width={150}
+                height={150}
+                className="object-contain drop-shadow-sm"
+              />
             </div>
             <h1 className="font-display text-3xl mb-2 text-white">Notícias</h1>
             <p className="text-white/80">Fique por dentro de tudo</p>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Category filter */}
-      <div className="px-4 mt-6 max-w-2xl mx-auto">
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.3 }}
+        className="px-4 mt-6 max-w-2xl mx-auto"
+      >
         <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-          <button
-            onClick={() => setSelectedCategory('all')}
-            className={`shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition-all ${selectedCategory === 'all'
-              ? 'bg-gradient-to-br from-violet-500 to-purple-700 text-white'
-              : 'bg-surface-100 text-surface-600 hover:bg-surface-200'
-              }`}
-          >
-            Todas
-          </button>
-          {Object.entries(NEWS_CATEGORY_LABELS).map(([key, label]) => (
+          {categories.map((category) => (
             <button
-              key={key}
-              onClick={() => setSelectedCategory(key)}
-              className={`shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition-all ${selectedCategory === key
-                ? 'bg-gradient-to-br from-violet-500 to-purple-700 text-white'
+              key={category.id}
+              onClick={() => setSelectedCategory(category.id)}
+              className={`shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition-all ${selectedCategory === category.id
+                ? 'bg-gradient-to-br from-rose-700 to-rose-900 text-white'
                 : 'bg-surface-100 text-surface-600 hover:bg-surface-200'
                 }`}
             >
-              {label}
+              {category.label}
             </button>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* News list */}
       <div className="mt-6 pb-6 px-4 max-w-2xl mx-auto">
@@ -81,54 +127,64 @@ export default function NoticiasPage() {
             <div className="animate-spin w-8 h-8 border-4 border-fire-500 border-t-transparent rounded-full mx-auto" />
           </div>
         ) : filteredNews.length === 0 ? (
-          <div className="text-center py-12">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-12"
+          >
             <Newspaper size={48} className="text-surface-300 mx-auto mb-4" />
             <p className="text-surface-400">Nenhuma notícia encontrada</p>
-          </div>
+          </motion.div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+          >
             {filteredNews.map((article) => (
-              <Link
-                key={article.id}
-                href={`/noticias/${article.id}`}
-                className="bg-white rounded-xl shadow-sm border border-surface-100 overflow-hidden hover:shadow-md transition-shadow active:scale-[0.99]"
-              >
-                {article.image_url && (
-                  <div className="h-32 bg-surface-100 overflow-hidden relative">
-                    <img
-                      src={article.image_url}
-                      alt={article.title}
-                      className="w-full h-full object-cover"
-                    />
-                    {article.is_featured && (
-                      <div className="absolute top-2 right-2 bg-sand-400 text-white px-2 py-1 rounded-full text-[9px] font-bold flex items-center gap-1">
-                        <Star size={10} fill="currentColor" />
-                        Destaque
-                      </div>
-                    )}
+              <motion.div key={article.id} variants={itemVariants}>
+                <Link
+                  href={`/noticias/${article.id}`}
+                  className="block bg-white rounded-xl shadow-sm border border-surface-100 overflow-hidden hover:shadow-md transition-shadow active:scale-[0.99] h-full"
+                >
+                  {article.image_url && (
+                    <div className="h-32 bg-surface-100 overflow-hidden relative">
+                      <img
+                        src={article.image_url}
+                        alt={article.title}
+                        className="w-full h-full object-cover"
+                      />
+                      {article.is_featured && (
+                        <div className="absolute top-2 right-2 bg-sand-400 text-white px-2 py-1 rounded-full text-[9px] font-bold flex items-center gap-1">
+                          <Star size={10} fill="currentColor" />
+                          Destaque
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="p-3 text-left">
+                    <span className="category-pill bg-fire-100 text-fire-700 text-[9px] px-2 py-0.5">
+                      {NEWS_CATEGORY_LABELS[article.category as NewsCategory] || article.category}
+                    </span>
+
+                    <h3 className="font-bold text-sm text-surface-900 mt-2 line-clamp-2 leading-tight">
+                      {article.title}
+                    </h3>
+
+                    <p className="text-xs text-surface-500 mt-1.5 line-clamp-2 leading-relaxed">
+                      {article.summary}
+                    </p>
+
+                    <p className="text-[10px] text-surface-400 mt-2">
+                      {formatDateTime(article.published_at)}
+                    </p>
                   </div>
-                )}
-
-                <div className="p-3 text-left">
-                  <span className="category-pill bg-fire-100 text-fire-700 text-[9px] px-2 py-0.5">
-                    {NEWS_CATEGORY_LABELS[article.category as NewsCategory] || article.category}
-                  </span>
-
-                  <h3 className="font-bold text-sm text-surface-900 mt-2 line-clamp-2 leading-tight">
-                    {article.title}
-                  </h3>
-
-                  <p className="text-xs text-surface-500 mt-1.5 line-clamp-2 leading-relaxed">
-                    {article.summary}
-                  </p>
-
-                  <p className="text-[10px] text-surface-400 mt-2">
-                    {formatDateTime(article.published_at)}
-                  </p>
-                </div>
-              </Link>
+                </Link>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
 
         {/* Instagram Banner */}

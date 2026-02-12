@@ -2,55 +2,56 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { ShoppingBag, MapPin, Phone, Search, Store, Star } from 'lucide-react';
-import type { Business, BusinessCategory } from '@/types';
-import { CATEGORY_LABELS } from '@/lib/utils';
+import { ShoppingBag, MapPin, Search, Store, Star, MessageCircle, Instagram } from 'lucide-react';
+import type { Service, ServiceCategory } from '@/types';
+import { SERVICE_CATEGORY_LABELS } from '@/lib/utils';
+
+function getCategoryLabel(category: string): string {
+    return SERVICE_CATEGORY_LABELS[category as ServiceCategory] || category;
+}
 
 export default function ServicesPage() {
-    const [businesses, setBusinesses] = useState<Business[]>([]);
+    const [services, setServices] = useState<Service[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
-
-    const categories: { id: string; label: string }[] = [
+    const [categories, setCategories] = useState<{ id: string; label: string }[]>([
         { id: 'all', label: 'Todos' },
-        { id: 'market', label: 'Mercados' },
-        { id: 'pharmacy', label: 'Farmácias' },
-        { id: 'gas_station', label: 'Postos' },
-        { id: 'hotel', label: 'Hospedagem' }, // Maybe move to separate page later? Keeping here for now as "Services/Stay"
-        { id: 'other', label: 'Outros' },
-    ];
-
-    // Logic to filter NON-gastronomy businesses
-    // Gastronomy = restaurant, bar, beach_club
-    const excludedCategories = ['restaurant', 'bar', 'beach_club'];
+    ]);
 
     useEffect(() => {
-        async function loadBusinesses() {
+        async function loadServices() {
             try {
-                // Fetch ALL and filter on client or complex query
-                // Supabase 'not.in' filter
-                let query = supabase
-                    .from('businesses')
+                const { data } = await supabase
+                    .from('services')
                     .select('*')
-                    .not('category', 'in', `(${excludedCategories.map(c => `"${c}"`).join(',')})`)
+                    .order('is_featured', { ascending: false })
                     .order('name');
 
-                const { data } = await query;
-                if (data) setBusinesses(data);
+                if (data) {
+                    setServices(data as Service[]);
+                    // Always show predefined categories + any custom ones from data
+                    const customCats = [...new Set(data.map((s: Service) => s.category))]
+                        .filter(cat => !(cat in SERVICE_CATEGORY_LABELS));
+                    setCategories([
+                        { id: 'all', label: 'Todos' },
+                        ...Object.entries(SERVICE_CATEGORY_LABELS).map(([id, label]) => ({ id, label })),
+                        ...customCats.map(cat => ({ id: cat, label: cat })),
+                    ]);
+                }
             } catch (error) {
                 console.error('Erro ao carregar serviços:', error);
             } finally {
                 setLoading(false);
             }
         }
-        loadBusinesses();
+        loadServices();
     }, []);
 
-    const filteredBusinesses = businesses.filter((biz) => {
-        const matchesSearch = biz.name.toLowerCase().includes(search.toLowerCase()) ||
-            biz.description?.toLowerCase().includes(search.toLowerCase());
-        const matchesCategory = selectedCategory === 'all' || biz.category === selectedCategory;
+    const filteredServices = services.filter((svc) => {
+        const matchesSearch = svc.name.toLowerCase().includes(search.toLowerCase()) ||
+            svc.description?.toLowerCase().includes(search.toLowerCase());
+        const matchesCategory = selectedCategory === 'all' || svc.category === selectedCategory;
         return matchesSearch && matchesCategory;
     });
 
@@ -62,8 +63,8 @@ export default function ServicesPage() {
                     <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/20 mb-4 backdrop-blur-sm">
                         <ShoppingBag size={24} />
                     </div>
-                    <h1 className="font-display text-3xl mb-2">Serviços e Úteis</h1>
-                    <p className="text-white/80">Mercados, farmácias e hospedagem</p>
+                    <h1 className="font-display text-3xl mb-2">Serviços</h1>
+                    <p className="text-white/80">Pousadas, hospitais, farmácias e mais</p>
                 </div>
             </header>
 
@@ -77,7 +78,7 @@ export default function ServicesPage() {
                             placeholder="Buscar serviço..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 bg-surface-50 rounded-lg text-sm outline-none focus:ring-2 focus:ring-emerald-200 transaction-all"
+                            className="w-full pl-10 pr-4 py-2 bg-surface-50 rounded-lg text-sm outline-none focus:ring-2 focus:ring-emerald-200 transition-all"
                         />
                     </div>
                     <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
@@ -103,12 +104,12 @@ export default function ServicesPage() {
                     <div className="text-center py-12">
                         <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto" />
                     </div>
-                ) : filteredBusinesses.length > 0 ? (
-                    filteredBusinesses.map((biz) => (
-                        <div key={biz.id} className="bg-white rounded-xl shadow-sm border border-surface-100 p-4 flex gap-4">
+                ) : filteredServices.length > 0 ? (
+                    filteredServices.map((svc) => (
+                        <div key={svc.id} className="bg-white rounded-xl shadow-sm border border-surface-100 p-4 flex gap-4">
                             <div className="w-16 h-16 bg-surface-100 rounded-lg shrink-0 overflow-hidden">
-                                {biz.image_url ? (
-                                    <img src={biz.image_url} alt={biz.name} className="w-full h-full object-cover" />
+                                {svc.image_url ? (
+                                    <img src={svc.image_url} alt={svc.name} className="w-full h-full object-cover" />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-surface-300">
                                         <Store size={20} />
@@ -118,32 +119,60 @@ export default function ServicesPage() {
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-start justify-between">
                                     <div>
-                                        <h3 className="font-bold text-surface-900 truncate pr-2">{biz.name}</h3>
-                                        {biz.rating && biz.rating > 0 && (
-                                            <div className="flex items-center gap-0.5 mb-1">
-                                                {Array.from({ length: 5 }).map((_, i) => (
-                                                    <Star
-                                                        key={i}
-                                                        size={10}
-                                                        className={`${i < Math.round(biz.rating || 0) ? 'text-amber-400 fill-amber-400' : 'text-surface-200'}`}
-                                                    />
-                                                ))}
-                                                <span className="text-[10px] text-surface-500 font-medium ml-1">({biz.rating})</span>
-                                            </div>
-                                        )}
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="font-bold text-surface-900 truncate pr-2">{svc.name}</h3>
+                                            {svc.is_featured && (
+                                                <Star size={14} className="text-amber-400 fill-amber-400 shrink-0" />
+                                            )}
+                                        </div>
                                         <div className="flex items-center gap-1 text-[10px] text-surface-500 mb-1">
-                                            <span className="px-1.5 py-0.5 rounded bg-surface-100 text-surface-600 font-medium">
-                                                {CATEGORY_LABELS[biz.category as BusinessCategory]}
+                                            <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 font-medium">
+                                                {getCategoryLabel(svc.category)}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
-                                <p className="text-xs text-surface-500 line-clamp-1 mb-2">{biz.description}</p>
+
+                                {svc.description && (
+                                    <p className="text-xs text-surface-500 line-clamp-1 mb-1">{svc.description}</p>
+                                )}
+
+                                {svc.address && (
+                                    <div className="flex items-center gap-1 text-xs text-surface-400 mb-2">
+                                        <MapPin size={12} />
+                                        <span className="truncate">{svc.address}</span>
+                                    </div>
+                                )}
 
                                 <div className="flex gap-2">
-                                    {biz.phone && (
-                                        <a href={`tel:${biz.phone}`} className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded hover:bg-emerald-100">
-                                            <Phone size={12} /> Ligar
+                                    {svc.whatsapp && (
+                                        <a
+                                            href={`https://wa.me/55${svc.whatsapp.replace(/\D/g, '')}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded hover:bg-emerald-100 transition-colors"
+                                        >
+                                            <MessageCircle size={12} /> WhatsApp
+                                        </a>
+                                    )}
+                                    {svc.instagram && (
+                                        <a
+                                            href={`https://instagram.com/${svc.instagram.replace('@', '')}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-1 text-xs font-bold text-pink-600 bg-pink-50 px-2 py-1 rounded hover:bg-pink-100 transition-colors"
+                                        >
+                                            <Instagram size={12} /> Instagram
+                                        </a>
+                                    )}
+                                    {svc.latitude && svc.longitude && (
+                                        <a
+                                            href={`https://www.google.com/maps?q=${svc.latitude},${svc.longitude}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-1 text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded hover:bg-blue-100 transition-colors"
+                                        >
+                                            <MapPin size={12} /> Mapa
                                         </a>
                                     )}
                                 </div>

@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useCrud } from '@/hooks/useCrud';
 import CrudTable from '@/components/admin/CrudTable';
 import NewsModal from '@/components/admin/NewsModal';
-import { formatDateTime } from '@/lib/utils';
-import type { NewsArticle } from '@/types';
+import { formatDateTime, NEWS_CATEGORY_LABELS } from '@/lib/utils';
+import type { NewsArticle, NewsCategory } from '@/types';
 
 export default function NoticiasAdminPage() {
   const { items, loading, createItem, updateItem, deleteItem } = useCrud<NewsArticle>({
@@ -37,7 +37,11 @@ export default function NoticiasAdminPage() {
 
   const columns = [
     { key: 'title' as const, label: 'Título' },
-    { key: 'category' as const, label: 'Categoria' },
+    {
+      key: 'category' as const,
+      label: 'Categoria',
+      render: (value: string) => NEWS_CATEGORY_LABELS[value as NewsCategory] || value
+    },
     {
       key: 'published_at' as const,
       label: 'Publicado em',

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { motion, type Variants } from 'framer-motion';
 import {
   Calendar, MapPin, Newspaper, Phone, Store, ChevronRight,
   Shield, Star, ArrowRight, Music,
@@ -72,15 +73,53 @@ export default function HomePage() {
   const quickLinks = [
     { href: '/mapa', icon: MapPin, label: 'Mapa Interativo', desc: 'Todos os locais', color: 'from-sky-400 to-blue-600' },
     { href: '/gastronomia', icon: Beer, label: 'Bares & Restaurantes', desc: 'Onde comer e beber', color: 'from-orange-400 to-orange-600' },
-    { href: '/noticias', icon: Newspaper, label: 'Notícias', desc: 'Fique por dentro', color: 'from-violet-500 to-purple-700' },
+    { href: '/noticias', icon: Newspaper, label: 'Notícias', desc: 'Fique por dentro', color: 'from-rose-700 to-rose-900' },
     { href: '/programacao', icon: Calendar, label: 'Programação', desc: 'Atrações e eventos', color: 'from-fuchsia-500 to-pink-600' },
     { href: '/servicos', icon: ShoppingBag, label: 'Serviços', desc: 'Talvez você precise', color: 'from-emerald-500 to-green-600' },
   ];
 
+  // Animation Variants
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants: Variants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100
+      }
+    }
+  };
+
+  const fadeInVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6 }
+    }
+  };
+
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="px-4 pt-4 pb-2 max-w-2xl mx-auto">
+      <motion.section
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeInVariants}
+        className="px-4 pt-4 pb-2 max-w-2xl mx-auto"
+      >
         <div className="relative overflow-hidden rounded-xl shadow-xl bg-gradient-to-br from-fire-800 to-fire-600">
           {heroImage && (
             <div className="absolute inset-0 z-0">
@@ -99,7 +138,12 @@ export default function HomePage() {
           <div className={`relative noise ${!heroImage ? 'bg-transparent' : ''}`}>
             <div className="relative z-10 px-5 pt-12 pb-8 text-center">
               {/* Logo */}
-              <div className="mb-2 flex justify-center">
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="mb-2 flex justify-center"
+              >
                 <Image
                   src="/logo.png"
                   alt="Paracuru Folia 2026"
@@ -108,39 +152,61 @@ export default function HomePage() {
                   className="drop-shadow-xl"
                   priority
                 />
-              </div>
-              <div className="flex items-center justify-center gap-2 mt-4 text-sm text-white/90 font-medium drop-shadow-sm">
+              </motion.div>
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="flex items-center justify-center gap-2 mt-4 text-sm text-white/90 font-medium drop-shadow-sm"
+              >
                 <Calendar size={14} />
                 <span>{carnivalDates}</span>
-              </div>
-              <div className="flex items-center justify-center gap-2 mt-1 text-sm text-white/70 font-medium drop-shadow-sm">
+              </motion.div>
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="flex items-center justify-center gap-2 mt-1 text-sm text-white/70 font-medium drop-shadow-sm"
+              >
                 <MapPin size={14} />
                 <span>{location}</span>
-              </div>
+              </motion.div>
 
               {/* CTA */}
-              <button
+              <motion.button
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.6 }}
                 onClick={() => router.push('/programacao')}
-                className="inline-flex items-center gap-2 mt-6 px-6 py-3 rounded-xl bg-white/15 backdrop-blur-sm border border-white/20 text-white font-semibold text-sm hover:bg-white/25 transition-all active:scale-95 shadow-lg"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center gap-2 mt-6 px-6 py-3 rounded-xl bg-white/15 backdrop-blur-sm border border-white/20 text-white font-semibold text-sm hover:bg-white/25 transition-all shadow-lg"
               >
                 <Music size={16} />
                 Ver programação completa
                 <ChevronRight size={16} />
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Quick Links */}
       <section className="mt-8 max-w-2xl mx-auto pl-4">
-        <div className="flex overflow-x-auto gap-3 pb-4 pr-4 no-scrollbar">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          className="flex overflow-x-auto gap-3 pb-4 pr-4 no-scrollbar"
+        >
           {quickLinks.map((link) => {
             const Icon = link.icon;
             const isFree = freeRoutes.includes(link.href);
             return (
-              <button
+              <motion.button
                 key={link.href}
+                variants={itemVariants}
                 onClick={() => {
                   if (!isFree && !isPremium) {
                     openPaymentModal();
@@ -159,15 +225,21 @@ export default function HomePage() {
                   <p className="font-bold text-sm mt-2 leading-tight">{link.label}</p>
                   <p className="text-[10px] text-white/70 mt-0.5">{link.desc}</p>
                 </div>
-              </button>
+              </motion.button>
             );
           })}
-        </div>
+        </motion.div>
       </section>
 
       {/* News Slider */}
       {news.length > 0 && (
-        <section className="px-4 mt-8 max-w-2xl mx-auto">
+        <motion.section
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={fadeInVariants}
+          className="px-4 mt-8 max-w-2xl mx-auto"
+        >
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-lg text-surface-900">Últimas Notícias</h2>
             <button
@@ -178,7 +250,7 @@ export default function HomePage() {
             </button>
           </div>
           <NewsSlider news={news} supportWhatsapp={supportWhatsapp} />
-        </section>
+        </motion.section>
       )}
 
       {/* Featured Businesses */}
@@ -190,10 +262,17 @@ export default function HomePage() {
               Destaques
             </h2>
           </div>
-          <div className="flex overflow-x-auto gap-3 pb-4 -mx-4 px-4 no-scrollbar snap-x">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            className="flex overflow-x-auto gap-3 pb-4 -mx-4 px-4 no-scrollbar snap-x"
+          >
             {featured.map((biz) => (
-              <button
+              <motion.button
                 key={biz.id}
+                variants={itemVariants}
                 onClick={() => {
                   setSelectedBusiness(biz);
                   setIsModalOpen(true);
@@ -230,9 +309,9 @@ export default function HomePage() {
                   )}
                   <p className="text-xs text-surface-500 line-clamp-2 leading-relaxed">{biz.description || CATEGORY_LABELS[biz.category as BusinessCategory]}</p>
                 </div>
-              </button>
+              </motion.button>
             ))}
-          </div>
+          </motion.div>
         </section>
       )}
 
@@ -241,12 +320,18 @@ export default function HomePage() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-display text-lg text-surface-900">Contatos de Emergência</h2>
           <button onClick={() => router.push('/contatos')} className="text-xs text-fire-600 font-semibold flex items-center gap-1">
-            Ver todos <ChevronRight size={14} />
+            Ver todas <ChevronRight size={14} />
           </button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-3"
+        >
           {/* Hospital */}
-          <a href="tel:192" className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all top-card">
+          <motion.a variants={itemVariants} href="tel:192" className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all top-card">
             <div className="w-10 h-10 rounded-xl bg-red-500 flex items-center justify-center mb-3 shadow-sm">
               <Store size={20} className="text-white" />
             </div>
@@ -256,10 +341,10 @@ export default function HomePage() {
                 <Phone size={10} /> 192
               </p>
             </div>
-          </a>
+          </motion.a>
 
           {/* Police */}
-          <a href="tel:190" className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all top-card">
+          <motion.a variants={itemVariants} href="tel:190" className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all top-card">
             <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center mb-3 shadow-sm">
               <Shield size={20} className="text-white" />
             </div>
@@ -269,10 +354,10 @@ export default function HomePage() {
                 <Phone size={10} /> 190
               </p>
             </div>
-          </a>
+          </motion.a>
 
           {/* Taxi */}
-          <button onClick={() => router.push('/contatos')} className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all relative overflow-hidden group text-left">
+          <motion.button variants={itemVariants} onClick={() => router.push('/contatos')} className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all relative overflow-hidden group text-left">
             <div className="flex items-start justify-between mb-3 w-full">
               <div className="w-10 h-10 rounded-xl bg-amber-400 flex items-center justify-center shadow-sm">
                 <Car size={20} className="text-white" />
@@ -290,10 +375,10 @@ export default function HomePage() {
                 Ver lista completa <ChevronRight size={10} />
               </div>
             </div>
-          </button>
+          </motion.button>
 
           {/* Mototaxi */}
-          <button onClick={() => router.push('/contatos')} className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all relative overflow-hidden group text-left">
+          <motion.button variants={itemVariants} onClick={() => router.push('/contatos')} className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all relative overflow-hidden group text-left">
             <div className="flex items-start justify-between mb-3 w-full">
               <div className="w-10 h-10 rounded-xl bg-green-500 flex items-center justify-center shadow-sm">
                 <Car size={20} className="text-white" />
@@ -311,15 +396,21 @@ export default function HomePage() {
                 Ver lista completa <ChevronRight size={10} />
               </div>
             </div>
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       </section>
 
 
 
       {/* Premium CTA */}
       {!isPremium && (
-        <section className="px-4 mb-8 max-w-2xl mx-auto">
+        <motion.section
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeInVariants}
+          className="px-4 mb-8 max-w-2xl mx-auto"
+        >
           <button
             onClick={openPaymentModal}
             className="w-full relative overflow-hidden rounded-xl p-6 text-left"
@@ -336,11 +427,17 @@ export default function HomePage() {
               </span>
             </div>
           </button>
-        </section>
+        </motion.section>
       )}
 
       {/* Commercial Opportunity Banner */}
-      <section className="px-4 mb-8 max-w-2xl mx-auto">
+      <motion.section
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeInVariants}
+        className="px-4 mb-8 max-w-2xl mx-auto"
+      >
         <a
           href={`https://wa.me/55${supportWhatsapp.replace(/\D/g, '')}?text=Olá! Gostaria de anunciar no Guia do Carnaval.`}
           target="_blank"
@@ -365,7 +462,7 @@ export default function HomePage() {
             </span>
           </div>
         </a>
-      </section>
+      </motion.section>
 
       <EstablishmentModal
         business={selectedBusiness}

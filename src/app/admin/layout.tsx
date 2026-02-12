@@ -8,6 +8,7 @@ import {
   Calendar,
   Newspaper,
   Store,
+  Briefcase,
   Phone,
   Car,
   Settings,
@@ -23,6 +24,7 @@ const navItems = [
   { href: '/admin/atracoes', icon: Calendar, label: 'Atrações' },
   { href: '/admin/noticias', icon: Newspaper, label: 'Notícias' },
   { href: '/admin/estabelecimentos', icon: Store, label: 'Estabelecimentos' },
+  { href: '/admin/servicos', icon: Briefcase, label: 'Serviços' },
   { href: '/admin/contatos', icon: Phone, label: 'Contatos' },
   { href: '/admin/configuracoes', icon: Settings, label: 'Configurações' },
 ];

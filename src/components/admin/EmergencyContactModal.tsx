@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Save, Phone } from 'lucide-react';
+import { X, Save, Phone, User, Tag, Shield, Hash, Loader2 } from 'lucide-react';
 import type { EmergencyContact } from '@/types';
+import toast from 'react-hot-toast';
 
 interface EmergencyContactModalProps {
     isOpen: boolean;
@@ -41,17 +42,17 @@ export default function EmergencyContactModal({ isOpen, onClose, onSave, initial
         e.preventDefault();
 
         if (!formData.name?.trim()) {
-            alert('Nome é obrigatório');
+            toast.error('Nome é obrigatório');
             return;
         }
 
         if (!formData.phone?.trim()) {
-            alert('Telefone é obrigatório');
+            toast.error('Telefone é obrigatório');
             return;
         }
 
         if (!formData.category?.trim()) {
-            alert('Categoria é obrigatória');
+            toast.error('Categoria é obrigatória');
             return;
         }
 
@@ -61,122 +62,131 @@ export default function EmergencyContactModal({ isOpen, onClose, onSave, initial
             onClose();
         } catch (error) {
             console.error('Error saving emergency contact:', error);
-            alert('Erro ao salvar contato');
+            toast.error('Erro ao salvar contato');
         } finally {
             setLoading(false);
         }
     }
 
+    const handleChange = (field: keyof EmergencyContact, value: any) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
-                <div className="flex items-center justify-between p-6 border-b border-surface-100 bg-white">
-                    <h2 className="text-xl font-bold text-surface-900">
-                        {initialData ? 'Editar Contato de Emergência' : 'Novo Contato de Emergência'}
-                    </h2>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+                {/* Header */}
+                <div className="flex items-center justify-between p-5 border-b border-surface-100 sticky top-0 bg-white z-10 rounded-t-2xl">
+                    <div>
+                        <h2 className="text-lg font-bold text-surface-900">
+                            {initialData ? 'Editar Contato' : 'Novo Contato'}
+                        </h2>
+                        <p className="text-xs text-surface-400 mt-0.5">Emergência e serviços essenciais</p>
+                    </div>
                     <button
                         onClick={onClose}
-                        className="p-2 text-surface-400 hover:text-surface-600 hover:bg-surface-50 rounded-lg transition-colors"
+                        className="p-2 text-surface-400 hover:text-surface-600 hover:bg-surface-100 rounded-xl transition-colors"
                     >
                         <X size={20} />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                <form onSubmit={handleSubmit} className="p-5 space-y-5">
                     {/* Name */}
                     <div>
-                        <label className="block text-sm font-medium text-surface-700 mb-1">
-                            Nome *
+                        <label className="flex items-center gap-1.5 text-xs font-semibold text-surface-500 uppercase tracking-wide mb-1.5">
+                            <User size={12} /> Nome / Serviço *
                         </label>
                         <input
                             type="text"
                             required
                             value={formData.name || ''}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="w-full px-4 py-2 rounded-lg border border-surface-200 focus:border-fire-500 focus:ring-2 focus:ring-fire-200 outline-none transition-all"
-                            placeholder="Ex: Hospital / Pronto Socorro"
+                            onChange={(e) => handleChange('name', e.target.value)}
+                            className="w-full px-4 py-2.5 rounded-xl border border-surface-200 focus:border-red-500 focus:ring-2 focus:ring-red-100 outline-none transition-all text-sm"
+                            placeholder="Ex: Hospital Municipal"
                         />
                     </div>
 
                     {/* Phone */}
                     <div>
-                        <label className="block text-sm font-medium text-surface-700 mb-1">
-                            Telefone *
+                        <label className="flex items-center gap-1.5 text-xs font-semibold text-surface-500 uppercase tracking-wide mb-1.5">
+                            <Phone size={12} /> Telefone *
                         </label>
                         <input
                             type="tel"
                             required
                             value={formData.phone || ''}
-                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                            className="w-full px-4 py-2 rounded-lg border border-surface-200 focus:border-fire-500 focus:ring-2 focus:ring-fire-200 outline-none transition-all"
-                            placeholder="192"
+                            onChange={(e) => handleChange('phone', e.target.value)}
+                            className="w-full px-4 py-2.5 rounded-xl border border-surface-200 focus:border-red-500 focus:ring-2 focus:ring-red-100 outline-none transition-all text-sm"
+                            placeholder="Ex: 190 ou (85) 3344-0000"
                         />
                     </div>
 
                     {/* Category */}
                     <div>
-                        <label className="block text-sm font-medium text-surface-700 mb-1">
-                            Categoria *
+                        <label className="flex items-center gap-1.5 text-xs font-semibold text-surface-500 uppercase tracking-wide mb-1.5">
+                            <Tag size={12} /> Categoria *
                         </label>
                         <select
                             required
                             value={formData.category || ''}
-                            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                            className="w-full px-4 py-2 rounded-lg border border-surface-200 focus:border-fire-500 focus:ring-2 focus:ring-fire-200 outline-none transition-all"
+                            onChange={(e) => handleChange('category', e.target.value)}
+                            className="w-full px-4 py-2.5 rounded-xl border border-surface-200 focus:border-red-500 focus:ring-2 focus:ring-red-100 outline-none transition-all text-sm appearance-none bg-white"
                         >
                             <option value="">Selecione uma categoria</option>
-                            <option value="hospital">Hospital</option>
-                            <option value="police">Polícia</option>
-                            <option value="fire">Bombeiros</option>
-                            <option value="other">Outro</option>
+                            <option value="hospital">Hospital / Saúde</option>
+                            <option value="police">Polícia / Segurança</option>
+                            <option value="fire">Bombeiros / Defesa Civil</option>
+                            <option value="other">Outros Serviços</option>
                         </select>
                     </div>
 
-                    {/* Icon */}
-                    <div>
-                        <label className="block text-sm font-medium text-surface-700 mb-1">
-                            Ícone
-                        </label>
-                        <input
-                            type="text"
-                            value={formData.icon || ''}
-                            onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                            className="w-full px-4 py-2 rounded-lg border border-surface-200 focus:border-fire-500 focus:ring-2 focus:ring-fire-200 outline-none transition-all"
-                            placeholder="Ex: shield, stethoscope, flame"
-                        />
-                        <p className="text-xs text-surface-500 mt-1">
-                            Nome do ícone Lucide (opcional)
-                        </p>
+                    {/* Icon & Order Grid */}
+                    <div className="grid grid-cols-2 gap-4">
+                        {/* Icon */}
+                        <div>
+                            <label className="flex items-center gap-1.5 text-xs font-semibold text-surface-500 uppercase tracking-wide mb-1.5">
+                                <Shield size={12} /> Ícone Lucide
+                            </label>
+                            <input
+                                type="text"
+                                value={formData.icon || ''}
+                                onChange={(e) => handleChange('icon', e.target.value)}
+                                className="w-full px-4 py-2.5 rounded-xl border border-surface-200 focus:border-red-500 focus:ring-2 focus:ring-red-100 outline-none transition-all text-sm"
+                                placeholder="Ex: shield"
+                            />
+                        </div>
+
+                        {/* Order Index */}
+                        <div>
+                            <label className="flex items-center gap-1.5 text-xs font-semibold text-surface-500 uppercase tracking-wide mb-1.5">
+                                <Hash size={12} /> Ordem
+                            </label>
+                            <input
+                                type="number"
+                                min="0"
+                                value={formData.order_index || 0}
+                                onChange={(e) => handleChange('order_index', parseInt(e.target.value) || 0)}
+                                className="w-full px-4 py-2.5 rounded-xl border border-surface-200 focus:border-red-500 focus:ring-2 focus:ring-red-100 outline-none transition-all text-sm"
+                            />
+                        </div>
                     </div>
 
-                    {/* Order Index */}
-                    <div>
-                        <label className="block text-sm font-medium text-surface-700 mb-1">
-                            Ordem
-                        </label>
-                        <input
-                            type="number"
-                            min="0"
-                            value={formData.order_index || 0}
-                            onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })}
-                            className="w-full px-4 py-2 rounded-lg border border-surface-200 focus:border-fire-500 focus:ring-2 focus:ring-fire-200 outline-none transition-all"
-                        />
-                    </div>
-
-                    <div className="flex items-center justify-end gap-3 pt-4 border-t border-surface-100">
+                    {/* Footer */}
+                    <div className="flex items-center justify-end gap-3 pt-3 border-t border-surface-100">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 text-sm font-semibold text-surface-600 hover:text-surface-800 hover:bg-surface-100 rounded-lg transition-colors"
+                            className="px-5 py-2.5 text-sm font-semibold text-surface-600 hover:text-surface-800 hover:bg-surface-100 rounded-xl transition-colors"
                         >
                             Cancelar
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex items-center gap-2 px-6 py-2 text-sm font-semibold text-white bg-fire-500 hover:bg-fire-600 active:bg-fire-700 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 active:bg-red-800 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                         >
-                            <Save size={18} />
+                            {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                             {loading ? 'Salvando...' : 'Salvar'}
                         </button>
                     </div>

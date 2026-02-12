@@ -16,8 +16,7 @@ export default function AtracoesAdminPage() {
   const [showModal, setShowModal] = useState(false);
 
   const columns = [
-    { key: 'name' as const, label: 'Nome' },
-    { key: 'artist' as const, label: 'Artista' },
+    { key: 'name' as const, label: 'Atração' },
     {
       key: 'date' as const,
       label: 'Data',

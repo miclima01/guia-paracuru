@@ -9,9 +9,11 @@ export interface Attraction {
   location?: string | null;
   artist?: string | null;
   image_url?: string | null;
+  instagram?: string | null;
   is_premium: boolean;
   is_featured?: boolean;
-  location_url?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   order_index: number;
   created_at: string;
   updated_at: string;
@@ -41,8 +43,8 @@ export interface Business {
   instagram?: string;
   website?: string;
   image_url?: string;
-  latitude?: number;
-  longitude?: number;
+  latitude?: number | null;
+  longitude?: number | null;
   is_partner: boolean;
   is_premium: boolean;
   is_featured: boolean;
@@ -115,6 +117,30 @@ export type BusinessCategory =
   | 'hospital'
   | 'health_post'
   | 'other';
+
+export interface Service {
+  id: string;
+  name: string;
+  description?: string | null;
+  category: string;
+  address?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  instagram?: string | null;
+  whatsapp?: string | null;
+  image_url?: string | null;
+  is_featured: boolean;
+  order_index: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export type ServiceCategory =
+  | 'pousada'
+  | 'hotel'
+  | 'hospital'
+  | 'pharmacy'
+  | 'market';
 
 export type EmergencyCategory =
   | 'hospital'

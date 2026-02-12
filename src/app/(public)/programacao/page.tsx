@@ -2,18 +2,45 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { Calendar, Info, MapPin, Music } from 'lucide-react';
+import { motion, type Variants } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { formatDate } from '@/lib/utils';
 import { formatCarnivalDateRangeUppercase } from '@/lib/format-dates';
 import type { Attraction } from '@/types';
 import AttractionCard from '@/components/public/AttractionCard';
+import AttractionModal from '@/components/public/AttractionModal';
 
 export default function ProgramacaoPage() {
   const [attractions, setAttractions] = useState<Attraction[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [carnivalDates, setCarnivalDates] = useState<string>('13 A 17 DE FEVEREIRO, 2026');
+  const [selectedAttraction, setSelectedAttraction] = useState<Attraction | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const tabsRef = useRef<HTMLDivElement>(null);
+
+  // Animation Variants
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants: Variants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100
+      }
+    }
+  };
 
   useEffect(() => {
     loadAttractions();
@@ -37,10 +64,10 @@ export default function ProgramacaoPage() {
 
   async function loadAttractions() {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('attractions')
-        .select('id,name,description,date,start_time,end_time,location,artist,image_url,is_premium,is_featured,location_url')
-        .order('date')
+        .select('id,name,description,date,start_time,end_time,location,artist,image_url,instagram,is_premium,is_featured,latitude,longitude')
+        .order('order_index')
         .order('start_time');
 
       if (data) {
@@ -74,11 +101,15 @@ export default function ProgramacaoPage() {
     { id: 'night', title: 'Noite', icon: '🌙', items: night },
   ].filter(s => s.items.length > 0);
 
-
   return (
     <div className="min-h-screen pb-20">
       {/* Header */}
-      <section className="px-4 pt-4 pb-2 max-w-2xl mx-auto">
+      <motion.section
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="px-4 pt-4 pb-2 max-w-2xl mx-auto"
+      >
         <div className="relative bg-gradient-to-br from-fuchsia-500 to-pink-600 text-white rounded-xl shadow-xl overflow-hidden">
           {/* Decorative elements */}
           <div className="absolute top-0 left-0 w-full h-full opacity-30 bg-[url('https://images.unsplash.com/photo-1514525253440-b393452e233e?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center" />
@@ -96,10 +127,15 @@ export default function ProgramacaoPage() {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Date Tabs */}
-      <div className="px-4 mt-6 max-w-2xl mx-auto">
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.3 }}
+        className="px-4 mt-6 max-w-2xl mx-auto"
+      >
         <div
           ref={tabsRef}
           className="flex overflow-x-auto pb-2 gap-2 no-scrollbar scroll-smooth"
@@ -126,7 +162,7 @@ export default function ProgramacaoPage() {
             );
           })}
         </div>
-      </div>
+      </motion.div>
 
       <div className="container mx-auto max-w-2xl px-4 mt-6 pb-6">
         {loading ? (
@@ -136,37 +172,61 @@ export default function ProgramacaoPage() {
             ))}
           </div>
         ) : filteredAttractions.length === 0 ? (
-          <div className="text-center py-12">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-12"
+          >
             <div className="w-16 h-16 bg-surface-200 rounded-full flex items-center justify-center mx-auto mb-4 text-surface-400">
               <Music size={32} />
             </div>
             <h3 className="text-surface-900 font-bold text-lg">Nenhuma atração</h3>
             <p className="text-surface-500">Nenhum evento programado para este dia.</p>
-          </div>
+          </motion.div>
         ) : (
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <motion.div
+            key={selectedDate} // Re-animate when date changes
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="space-y-8"
+          >
             {sections.map(section => (
-              <div key={section.id}>
+              <motion.div key={section.id} variants={itemVariants}>
                 <div className="flex items-center gap-2 mb-4 ml-1">
                   <span className="text-xl">{section.icon}</span>
                   <h2 className="font-display text-xl text-surface-900">{section.title}</h2>
                 </div>
-                <div className="space-y-4">
+                <motion.div
+                  variants={containerVariants}
+                  className="space-y-4"
+                >
                   {section.items.map((attraction) => (
-                    <AttractionCard
-                      key={attraction.id}
-                      attraction={attraction}
-                      isPremium={true}
-                    />
+                    <motion.div key={attraction.id} variants={itemVariants}>
+                      <AttractionCard
+                        attraction={attraction}
+                        isPremium={true}
+                        onClick={() => {
+                          setSelectedAttraction(attraction);
+                          setShowModal(true);
+                        }}
+                      />
+                    </motion.div>
                   ))}
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
 
         {/* Info Card */}
-        <div className="mt-8 bg-carnival-50 border border-carnival-100 rounded-2xl p-5">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.5 }}
+          className="mt-8 bg-carnival-50 border border-carnival-100 rounded-2xl p-5"
+        >
           <div className="flex items-center gap-2 mb-3 text-carnival-700 font-bold">
             <Info size={18} />
             <h3>Importante</h3>
@@ -177,8 +237,14 @@ export default function ProgramacaoPage() {
             <li>Entrada gratuita em todos os eventos</li>
             <li>Menores de 18 anos devem estar acompanhados</li>
           </ul>
-        </div>
+        </motion.div>
       </div>
+
+      <AttractionModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        attraction={selectedAttraction}
+      />
     </div>
   );
 }
