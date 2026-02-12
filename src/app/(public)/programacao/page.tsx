@@ -108,9 +108,9 @@ export default function ProgramacaoPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="px-4 pt-4 pb-2 max-w-2xl mx-auto"
+        className="px-0 sm:px-4 sm:pt-4 pb-2 max-w-2xl mx-auto"
       >
-        <div className="relative bg-gradient-to-br from-fuchsia-500 to-pink-600 text-white rounded-xl shadow-xl overflow-hidden">
+        <div className="relative bg-gradient-to-br from-fuchsia-500 to-pink-600 text-white sm:rounded-xl shadow-xl overflow-hidden">
           {/* Decorative elements */}
           <div className="absolute top-0 left-0 w-full h-full opacity-30 bg-[url('https://images.unsplash.com/photo-1514525253440-b393452e233e?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center" />
 

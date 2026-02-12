@@ -78,9 +78,9 @@ export default function NoticiasPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="px-4 pt-4 pb-2 max-w-2xl mx-auto"
+        className="px-0 sm:px-4 sm:pt-4 pb-2 max-w-2xl mx-auto"
       >
-        <div className="bg-gradient-to-br from-rose-700 to-rose-900 noise rounded-xl shadow-xl">
+        <div className="bg-gradient-to-br from-rose-700 to-rose-900 noise sm:rounded-xl shadow-xl">
           <div className="px-5 pt-8 pb-6 text-center">
             <div className="flex justify-center mb-4">
               <Image

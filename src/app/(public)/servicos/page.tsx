@@ -58,7 +58,7 @@ export default function ServicesPage() {
     return (
         <div className="min-h-screen pb-20">
             {/* Header */}
-            <header className="bg-emerald-600 text-white pt-8 pb-12 px-4 rounded-b-[2rem] shadow-lg">
+            <header className="bg-emerald-600 text-white pt-8 pb-12 px-4 rounded-b-[2rem] shadow-lg sm:rounded-xl sm:mx-auto sm:max-w-2xl sm:mt-4">
                 <div className="max-w-2xl mx-auto text-center">
                     <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/20 mb-4 backdrop-blur-sm">
                         <ShoppingBag size={24} />

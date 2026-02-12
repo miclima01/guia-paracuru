@@ -43,8 +43,8 @@ export default function ContatosPage() {
   return (
     <div className="min-h-screen pb-20">
       {/* Header */}
-      <section className="px-4 pt-4 pb-2 max-w-2xl mx-auto">
-        <div className="bg-gradient-to-br from-red-500 to-orange-600 noise rounded-xl shadow-xl">
+      <section className="px-0 sm:px-4 sm:pt-4 pb-2 max-w-2xl mx-auto">
+        <div className="bg-gradient-to-br from-red-500 to-orange-600 noise sm:rounded-xl shadow-xl">
           <div className="px-5 pt-8 pb-6 text-center">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/20 mb-4 backdrop-blur-sm">
               <Phone size={24} className="text-white" />
