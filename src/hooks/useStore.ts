@@ -21,7 +21,14 @@ export const useAppStore = create<AppState>((set) => ({
   // Premium
   isPremium: false,
   setIsPremium: (isPremium) => set({ isPremium }),
-  checkPremium: () => set({ isPremium: checkPremiumAccess() }),
+  checkPremium: () => {
+    // Only check if window is defined (client-side)
+    if (typeof window !== 'undefined') {
+      import('@/lib/premium').then(({ checkPremiumAccess }) => {
+        set({ isPremium: checkPremiumAccess() });
+      });
+    }
+  },
 
   // Payment modal
   isPaymentModalOpen: false,

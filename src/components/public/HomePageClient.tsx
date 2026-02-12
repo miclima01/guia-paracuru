@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, type Variants } from 'framer-motion';
@@ -35,7 +35,11 @@ export default function HomePageClient({
     const router = useRouter();
     const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { isPremium, openPaymentModal } = useAppStore();
+    const { isPremium, openPaymentModal, checkPremium } = useAppStore();
+
+    useEffect(() => {
+        checkPremium();
+    }, [checkPremium]);
 
     const freeRoutes = ['/noticias', '/programacao', '/mapa', '/gastronomia', '/servicos', '/contatos'];
     const quickLinks = [
