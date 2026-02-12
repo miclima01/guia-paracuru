@@ -9,6 +9,7 @@ export function formatDateTime(date: string | Date): string {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'America/Sao_Paulo',
   }).format(d);
 }
 
@@ -18,6 +19,7 @@ export function formatDate(date: string | Date): string {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
+    timeZone: 'America/Sao_Paulo',
   }).format(d);
 }
 
@@ -30,7 +32,8 @@ export function formatDateWithWeekday(dateStr: string): string {
     weekday: 'long',
     day: '2-digit',
     month: 'long',
-    year: 'numeric'
+    year: 'numeric',
+    timeZone: 'America/Sao_Paulo',
   });
 }
 
