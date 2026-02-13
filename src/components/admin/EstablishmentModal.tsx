@@ -4,7 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Save, Upload, MapPin, Loader2, Image as ImageIcon, Plus, MessageCircle, AtSign, Globe, Phone, Star, ShieldCheck, Tag } from 'lucide-react';
 import type { Business } from '@/types';
 import { CATEGORY_LABELS } from '@/lib/utils';
-import { uploadImage, supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
+import { uploadImage } from '@/actions/admin-actions';
+import Image from 'next/image';
 import toast from 'react-hot-toast';
 
 interface EstablishmentModalProps {
@@ -128,7 +130,9 @@ export default function EstablishmentModal({
 
         setUploading(true);
         try {
-            const url = await uploadImage(file, 'media');
+            const formData = new FormData();
+            formData.append('file', file);
+            const url = await uploadImage(formData, 'establishments');
             setFormData((prev) => ({ ...prev, image_url: url }));
             toast.success('Imagem enviada!');
         } catch (error) {
@@ -203,7 +207,13 @@ export default function EstablishmentModal({
                     >
                         {formData.image_url ? (
                             <>
-                                <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" />
+                                <Image
+                                    src={formData.image_url}
+                                    alt="Preview"
+                                    fill
+                                    className="object-cover"
+                                    unoptimized
+                                />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                     <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full text-white">
                                         <Upload size={20} />

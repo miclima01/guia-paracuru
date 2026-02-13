@@ -6,6 +6,7 @@ import { Edit2, Trash2, Plus, Search, Eye, EyeOff } from 'lucide-react';
 import AdvertisementAdminModal from '@/components/admin/AdvertisementAdminModal';
 import type { Advertisement } from '@/types/advertisement';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 
 export default function AdminBannersPage() {
     const [items, setItems] = useState<Advertisement[]>([]);
@@ -149,7 +150,15 @@ export default function AdminBannersPage() {
                                             <tr key={item.id} className="hover:bg-surface-50/50 transition-colors">
                                                 <td className="py-3 px-6">
                                                     {item.image_url ? (
-                                                        <img src={item.image_url} alt={item.title} className="w-10 h-10 rounded-lg object-cover border border-surface-200" />
+                                                        <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-surface-200">
+                                                            <Image
+                                                                src={item.image_url}
+                                                                alt={item.title}
+                                                                fill
+                                                                className="object-cover"
+                                                                unoptimized
+                                                            />
+                                                        </div>
                                                     ) : (
                                                         <div className="w-10 h-10 rounded-lg bg-surface-100 border border-surface-200" />
                                                     )}
@@ -200,7 +209,15 @@ export default function AdminBannersPage() {
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="flex items-center gap-3 min-w-0">
                                                 {item.image_url ? (
-                                                    <img src={item.image_url} alt={item.title} className="w-10 h-10 rounded-lg object-cover border border-surface-200 flex-shrink-0" />
+                                                    <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-surface-200 flex-shrink-0">
+                                                        <Image
+                                                            src={item.image_url}
+                                                            alt={item.title}
+                                                            fill
+                                                            className="object-cover"
+                                                            unoptimized
+                                                        />
+                                                    </div>
                                                 ) : (
                                                     <div className="w-10 h-10 rounded-lg bg-surface-100 border border-surface-200 flex-shrink-0" />
                                                 )}

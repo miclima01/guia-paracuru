@@ -20,35 +20,4 @@ export function createAdminClient() {
   });
 }
 
-// Upload image to Supabase Storage
-export async function uploadImage(
-  file: File,
-  bucket: string = 'media'
-): Promise<string> {
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-  const filePath = `${fileName}`;
 
-  const { error } = await supabase.storage.from(bucket).upload(filePath, file);
-
-  if (error) {
-    throw new Error(`Upload failed: ${error.message}`);
-  }
-
-  const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
-  return data.publicUrl;
-}
-
-// Delete image from Supabase Storage
-export async function deleteImage(
-  url: string,
-  bucket: string = 'media'
-): Promise<void> {
-  const path = url.split(`${bucket}/`)[1];
-  if (!path) return;
-
-  const { error } = await supabase.storage.from(bucket).remove([path]);
-  if (error) {
-    console.error('Delete image error:', error);
-  }
-}

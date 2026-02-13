@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Save, Upload, Image as ImageIcon, Loader2, Type, Link as LinkIcon, Hash, MousePointerClick } from 'lucide-react';
-import { uploadImage } from '@/lib/supabase';
+import { uploadImage } from '@/actions/admin-actions';
+import Image from 'next/image';
 import type { Advertisement } from '@/types/advertisement';
 import toast from 'react-hot-toast';
 
@@ -73,7 +74,9 @@ export default function AdvertisementAdminModal({ isOpen, onClose, onSave, initi
 
         setUploading(true);
         try {
-            const publicUrl = await uploadImage(file, 'media');
+            const formData = new FormData();
+            formData.append('file', file);
+            const publicUrl = await uploadImage(formData, 'ads');
             setFormData(prev => ({ ...prev, image_url: publicUrl }));
             toast.success('Imagem enviada!');
         } catch (error) {
@@ -147,7 +150,13 @@ export default function AdvertisementAdminModal({ isOpen, onClose, onSave, initi
                     >
                         {formData.image_url ? (
                             <>
-                                <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" />
+                                <Image
+                                    src={formData.image_url}
+                                    alt="Preview"
+                                    fill
+                                    className="object-cover"
+                                    unoptimized
+                                />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                     <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full text-white">
                                         <Upload size={20} />

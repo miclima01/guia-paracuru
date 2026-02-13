@@ -210,7 +210,7 @@ export async function uploadHeroImage(formData: FormData, key: string = 'hero_ba
     return publicUrl;
 }
 
-export async function uploadImage(formData: FormData, folder: string = 'ads'): Promise<string> {
+export async function uploadImage(formData: FormData, folder: string = 'media'): Promise<string> {
     await ensureAdmin();
 
     const file = formData.get('file') as File;
@@ -233,7 +233,9 @@ export async function uploadImage(formData: FormData, folder: string = 'ads'): P
     const supabase = createAdminClient();
     const timestamp = Date.now();
     const ext = file.name.split('.').pop();
-    const fileName = `${folder}/${timestamp}-${Math.random().toString(36).substring(7)}.${ext}`;
+    // Sanitize filename
+    const safeName = file.name.split('.')[0].replace(/[^a-z0-9]/gi, '-').toLowerCase();
+    const fileName = `${folder}/${safeName}-${timestamp}.${ext}`;
 
     const { error } = await supabase.storage
         .from('media')

@@ -4,7 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Save, Upload, Loader2, Image as ImageIcon, Plus, Newspaper, Calendar, Star, Tag, FileText, AlignLeft } from 'lucide-react';
 import type { NewsArticle } from '@/types';
 import { NEWS_CATEGORY_LABELS } from '@/lib/utils';
-import { uploadImage, supabase } from '@/lib/supabase';
+import { uploadImage } from '@/actions/admin-actions';
+import { supabase } from '@/lib/supabase';
+import Image from 'next/image';
 import toast from 'react-hot-toast';
 
 interface NewsModalProps {
@@ -110,7 +112,9 @@ export default function NewsModal({ isOpen, onClose, onSave, initialData }: News
 
         setUploading(true);
         try {
-            const url = await uploadImage(file, 'media');
+            const formData = new FormData();
+            formData.append('file', file);
+            const url = await uploadImage(formData, 'media');
             setFormData((prev) => ({ ...prev, image_url: url }));
             toast.success('Imagem enviada!');
         } catch (error) {
@@ -185,7 +189,13 @@ export default function NewsModal({ isOpen, onClose, onSave, initialData }: News
                     >
                         {formData.image_url ? (
                             <>
-                                <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" />
+                                <Image
+                                    src={formData.image_url}
+                                    alt="Preview"
+                                    fill
+                                    className="object-cover"
+                                    unoptimized
+                                />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                     <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full text-white">
                                         <Upload size={20} />
