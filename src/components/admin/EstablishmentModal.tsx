@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Save, Upload, MapPin, Loader2, Image as ImageIcon, Plus, MessageCircle, AtSign, Globe, Phone, Star, ShieldCheck, Tag } from 'lucide-react';
+import { X, Save, Upload, MapPin, Loader2, Image as ImageIcon, Plus, MessageCircle, AtSign, Globe, Phone, Star, ShieldCheck, Tag, Clock } from 'lucide-react';
 import type { Business } from '@/types';
 import { CATEGORY_LABELS } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -35,6 +35,7 @@ export default function EstablishmentModal({
         description: '',
         category: 'restaurant',
         address: '',
+        opening_hours: '',
         phone: '',
         whatsapp: '',
         instagram: '',
@@ -81,6 +82,7 @@ export default function EstablishmentModal({
                 description: '',
                 category: 'restaurant',
                 address: '',
+                opening_hours: '',
                 phone: '',
                 whatsapp: '',
                 instagram: '',
@@ -343,6 +345,22 @@ export default function EstablishmentModal({
                         />
                     </div>
 
+
+
+                    {/* Opening Hours */}
+                    <div>
+                        <label className="flex items-center gap-1.5 text-xs font-semibold text-surface-500 uppercase tracking-wide mb-1.5">
+                            <Clock size={12} /> Horário de Funcionamento
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.opening_hours || ''}
+                            onChange={(e) => handleChange('opening_hours', e.target.value)}
+                            className="w-full px-4 py-2.5 rounded-xl border border-surface-200 focus:border-carnival-500 focus:ring-2 focus:ring-carnival-100 outline-none transition-all text-sm"
+                            placeholder="Ex: Seg a Sex: 08:00 às 18:00 | Sáb: 08:00 às 12:00"
+                        />
+                    </div>
+
                     {/* Contact & Social */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
@@ -497,7 +515,7 @@ export default function EstablishmentModal({
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

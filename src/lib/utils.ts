@@ -46,17 +46,15 @@ export function formatCurrency(amount: number): string {
 }
 
 // Category labels
+// Category labels
 export const CATEGORY_LABELS: Record<BusinessCategory, string> = {
   restaurant: 'Restaurante',
   bar: 'Bar',
   hotel: 'Hotel',
   pousada: 'Pousada',
   beach_club: 'Beach Club',
-  pharmacy: 'Farmácia',
-  market: 'Mercado',
-  gas_station: 'Posto de Gasolina',
-  hospital: 'Hospital',
-  health_post: 'Posto de Saúde',
+  praia: 'Praia',
+  arena: 'Arena/Eventos',
   other: 'Outro',
 };
 
@@ -66,6 +64,13 @@ export const SERVICE_CATEGORY_LABELS: Record<ServiceCategory, string> = {
   hospital: 'Hospital',
   pharmacy: 'Farmácia',
   market: 'Mercado',
+  gas_station: 'Posto de Gasolina',
+  health_post: 'Posto de Saúde',
+  rodoviaria: 'Rodoviária',
+  bank: 'Banco',
+  police: 'Polícia',
+  mechanic: 'Mecânica',
+  other: 'Outro',
 };
 
 export const NEWS_CATEGORY_LABELS: Record<NewsCategory, string> = {

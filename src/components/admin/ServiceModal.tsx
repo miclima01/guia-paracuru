@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Save, Upload, MapPin, Loader2, Image as ImageIcon, Plus, Trash2, MessageCircle, AtSign, Star, Tag } from 'lucide-react';
+import { X, Save, Upload, MapPin, Loader2, Image as ImageIcon, Plus, Trash2, MessageCircle, AtSign, Star, Tag, Phone } from 'lucide-react';
 import { uploadImage } from '@/actions/admin-actions';
 import Image from 'next/image';
 import type { Service } from '@/types';
@@ -33,12 +33,13 @@ export default function ServiceModal({
     const [formData, setFormData] = useState<Partial<Service>>({
         name: '',
         description: '',
-        category: 'pousada',
+        category: 'pharmacy',
         address: '',
         latitude: null,
         longitude: null,
         instagram: '',
         whatsapp: '',
+        phone: '',
         image_url: '',
         is_featured: false,
         order_index: 0,
@@ -75,12 +76,13 @@ export default function ServiceModal({
             setFormData({
                 name: '',
                 description: '',
-                category: 'pousada',
+                category: 'pharmacy',
                 address: '',
                 latitude: null,
                 longitude: null,
                 instagram: '',
                 whatsapp: '',
+                phone: '',
                 image_url: '',
                 is_featured: false,
                 order_index: 0,
@@ -109,6 +111,7 @@ export default function ServiceModal({
                 image_url: formData.image_url || null,
                 instagram: formData.instagram || null,
                 whatsapp: formData.whatsapp || null,
+                phone: formData.phone || null,
             });
             onClose();
         } catch (error) {
@@ -357,7 +360,19 @@ export default function ServiceModal({
                     </div>
 
                     {/* Social & Contact */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label className="flex items-center gap-1.5 text-xs font-semibold text-surface-500 uppercase tracking-wide mb-1.5">
+                                <Phone size={12} /> Telefone
+                            </label>
+                            <input
+                                type="tel"
+                                value={formData.phone || ''}
+                                onChange={(e) => handleChange('phone', e.target.value)}
+                                className="w-full px-4 py-2.5 rounded-xl border border-surface-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all text-sm"
+                                placeholder="8533444444"
+                            />
+                        </div>
                         <div>
                             <label className="flex items-center gap-1.5 text-xs font-semibold text-surface-500 uppercase tracking-wide mb-1.5">
                                 <MessageCircle size={12} /> WhatsApp

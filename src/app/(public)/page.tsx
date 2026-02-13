@@ -20,7 +20,7 @@ export default async function HomePage() {
     stateRes
   ] = await Promise.all([
     supabase.from('news').select('id,title,summary,image_url,category,published_at').order('published_at', { ascending: false }).limit(3),
-    supabase.from('businesses').select('*').eq('is_featured', true).order('order_index').limit(4),
+    supabase.from('businesses').select('*').eq('is_featured', true).order('order_index').limit(10),
     supabase.from('app_settings').select('value').eq('key', 'hero_background_image').single(),
     supabase.from('app_settings').select('value').eq('key', 'support_whatsapp').single(),
     supabase.from('app_settings').select('value').eq('key', 'carnival_start_date').single(),

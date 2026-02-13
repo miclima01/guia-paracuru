@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { ShoppingBag, MapPin, Search, Store, Star, MessageCircle, Instagram } from 'lucide-react';
+import { ShoppingBag, MapPin, Search, Store, Star, MessageCircle, Instagram, Phone } from 'lucide-react';
 import type { Service, ServiceCategory } from '@/types';
 import { SERVICE_CATEGORY_LABELS } from '@/lib/utils';
 
@@ -147,6 +147,14 @@ export default function ServicesPage() {
                                 )}
 
                                 <div className="flex gap-2">
+                                    {svc.phone && (
+                                        <a
+                                            href={`tel:${svc.phone.replace(/\D/g, '')}`}
+                                            className="flex items-center gap-1 text-xs font-bold text-violet-600 bg-violet-50 px-2 py-1 rounded hover:bg-violet-100 transition-colors"
+                                        >
+                                            <Phone size={12} /> Ligar
+                                        </a>
+                                    )}
                                     {svc.whatsapp && (
                                         <a
                                             href={`https://wa.me/55${svc.whatsapp.replace(/\D/g, '')}`}

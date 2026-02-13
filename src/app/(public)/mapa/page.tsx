@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { MapPin, Store, List, Map as MapIcon, Phone, MessageCircle, Navigation, Star } from 'lucide-react';
+import { MapPin, Store, List, Map as MapIcon, Phone, MessageCircle, Navigation, Star, Clock } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CATEGORY_LABELS, SERVICE_CATEGORY_LABELS } from '@/lib/utils';
 import type { Business, Service } from '@/types';
@@ -56,6 +56,7 @@ export default function MapaPage() {
       description: b.description,
       category: b.category,
       address: b.address,
+      opening_hours: b.opening_hours,
       phone: b.phone,
       whatsapp: b.whatsapp,
       instagram: b.instagram,
@@ -73,6 +74,7 @@ export default function MapaPage() {
       description: s.description,
       category: s.category,
       address: s.address,
+      phone: s.phone,
       whatsapp: s.whatsapp,
       instagram: s.instagram,
       image_url: s.image_url,
@@ -211,6 +213,14 @@ export default function MapaPage() {
                   )}
 
                   <div className="flex gap-2 mt-auto">
+                    {item.phone && (
+                      <a
+                        href={`tel:${item.phone.replace(/\D/g, '')}`}
+                        className="w-8 h-8 rounded-full bg-violet-600 text-white flex items-center justify-center shadow-sm"
+                      >
+                        <Phone size={16} />
+                      </a>
+                    )}
                     {(item.whatsapp || item.phone) && (
                       <a
                         href={`https://wa.me/55${(item.whatsapp || item.phone || '').replace(/\D/g, '')}`}

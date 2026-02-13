@@ -38,6 +38,7 @@ export interface Business {
   description?: string;
   category: string;
   address?: string;
+  opening_hours?: string;
   phone?: string;
   whatsapp?: string;
   instagram?: string;
@@ -111,11 +112,8 @@ export type BusinessCategory =
   | 'hotel'
   | 'pousada'
   | 'beach_club'
-  | 'pharmacy'
-  | 'market'
-  | 'gas_station'
-  | 'hospital'
-  | 'health_post'
+  | 'praia'
+  | 'arena'
   | 'other';
 
 export interface Service {
@@ -128,6 +126,7 @@ export interface Service {
   longitude?: number | null;
   instagram?: string | null;
   whatsapp?: string | null;
+  phone?: string | null;
   image_url?: string | null;
   is_featured: boolean;
   order_index: number;
@@ -136,11 +135,18 @@ export interface Service {
 }
 
 export type ServiceCategory =
-  | 'pousada'
+  | 'pousada' // Keeping overlapping types if needed for legacy or specific logic, but ideally should be cleaned up. User asked for separation.
   | 'hotel'
   | 'hospital'
   | 'pharmacy'
-  | 'market';
+  | 'market'
+  | 'gas_station'
+  | 'health_post'
+  | 'rodoviaria'
+  | 'bank'
+  | 'police'
+  | 'mechanic'
+  | 'other';
 
 export type EmergencyCategory =
   | 'hospital'

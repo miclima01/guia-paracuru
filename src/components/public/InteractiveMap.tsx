@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { MapPin, Star, Navigation, MessageCircle } from 'lucide-react';
+import { MapPin, Star, Navigation, MessageCircle, Clock } from 'lucide-react';
 import { CATEGORY_LABELS, SERVICE_CATEGORY_LABELS } from '@/lib/utils';
 import type { BusinessCategory, ServiceCategory } from '@/types';
 
@@ -14,6 +14,7 @@ export interface MapMarker {
   description?: string | null;
   category: string;
   address?: string | null;
+  opening_hours?: string | null;
   phone?: string | null;
   whatsapp?: string | null;
   instagram?: string | null;
@@ -41,16 +42,22 @@ L.Icon.Default.mergeOptions({
 });
 
 const CATEGORY_EMOJIS: Record<string, string> = {
-  restaurant: '🍽️',
-  bar: '🍺',
-  hotel: '🏨',
-  pousada: '🏠',
-  beach_club: '🏖️',
+  restaurant: '🍴',
+  bar: '🍻',
+  hotel: '🛏️',
+  pousada: '🏡',
+  beach_club: '🍹',
   pharmacy: '💊',
   market: '🛒',
   gas_station: '⛽',
   hospital: '🏥',
   health_post: '🩺',
+  praia: '🏝️',
+  rodoviaria: '🚍',
+  bank: '💵',
+  police: '👮',
+  mechanic: '🔧',
+  arena: '🎪',
   other: '📍',
 };
 
@@ -65,6 +72,12 @@ const CATEGORY_COLORS: Record<string, string> = {
   gas_station: '#64748b',
   hospital: '#dc2626',
   health_post: '#e11d48',
+  praia: '#0ea5e9',
+  rodoviaria: '#475569',
+  bank: '#16a34a',
+  police: '#2563eb',
+  mechanic: '#475569',
+  arena: '#9333ea',
   other: '#ec4899',
 };
 
@@ -188,6 +201,13 @@ export default function InteractiveMap({ markers }: InteractiveMapProps) {
                   <p className="text-xs text-gray-400 mt-1.5 flex items-start gap-1">
                     <MapPin size={12} className="shrink-0 mt-0.5" />
                     {item.address}
+                  </p>
+                )}
+
+                {item.opening_hours && (
+                  <p className="text-xs text-gray-400 mt-1.5 flex items-start gap-1">
+                    <Clock size={12} className="shrink-0 mt-0.5" />
+                    {item.opening_hours}
                   </p>
                 )}
 

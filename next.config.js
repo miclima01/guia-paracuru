@@ -10,6 +10,14 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'deferiasnoceara.com.br',
       },
+      {
+        protocol: 'https',
+        hostname: 'encrypted-tbn0.gstatic.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.odiariodeumaviajante.com.br',
+      },
     ],
   },
   async headers() {

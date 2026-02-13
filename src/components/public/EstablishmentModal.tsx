@@ -3,7 +3,7 @@
 import { Business, BusinessCategory } from '@/types';
 import { CATEGORY_LABELS, formatPhone } from '@/lib/utils';
 import Image from 'next/image';
-import { X, MapPin, Phone, Instagram, Globe, Navigation, Star } from 'lucide-react';
+import { X, MapPin, Phone, Instagram, Globe, Navigation, Star, Clock } from 'lucide-react';
 import { useEffect } from 'react';
 
 interface EstablishmentModalProps {
@@ -113,6 +113,17 @@ export default function EstablishmentModal({ business, isOpen, onClose }: Establ
                                 <div>
                                     <p className="font-semibold text-surface-900 text-sm mb-1">Endereço</p>
                                     <p className="text-surface-600 text-sm">{business.address}</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Opening Hours */}
+                        {business.opening_hours && (
+                            <div className="flex items-start gap-3">
+                                <Clock size={20} className="text-fire-500 mt-0.5 flex-shrink-0" />
+                                <div>
+                                    <p className="font-semibold text-surface-900 text-sm mb-1">Horário de Funcionamento</p>
+                                    <p className="text-surface-600 text-sm">{business.opening_hours}</p>
                                 </div>
                             </div>
                         )}

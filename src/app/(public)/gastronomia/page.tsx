@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import Image from 'next/image';
-import { Beer, MapPin, Search, Store, Star } from 'lucide-react';
+import { Beer, MapPin, Search, Store, Star, Clock } from 'lucide-react';
 import type { Business, BusinessCategory } from '@/types';
 import { CATEGORY_LABELS } from '@/lib/utils';
 import EstablishmentModal from '@/components/public/EstablishmentModal';
@@ -160,6 +160,12 @@ export default function GastronomiaPage() {
                                             <div className="flex items-start gap-2 text-xs text-surface-500">
                                                 <MapPin size={14} className="shrink-0 mt-0.5" />
                                                 <span>{biz.address}</span>
+                                            </div>
+                                        )}
+                                        {biz.opening_hours && (
+                                            <div className="flex items-start gap-2 text-xs text-surface-500">
+                                                <Clock size={14} className="shrink-0 mt-0.5" />
+                                                <span>{biz.opening_hours}</span>
                                             </div>
                                         )}
                                     </div>
