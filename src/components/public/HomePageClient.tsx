@@ -41,7 +41,7 @@ export default function HomePageClient({
         checkPremium();
     }, [checkPremium]);
 
-    const freeRoutes = ['/noticias', '/programacao', '/mapa', '/gastronomia', '/servicos', '/contatos'];
+    const freeRoutes = ['/noticias', '/programacao'];
     const quickLinks = [
         { href: '/mapa', icon: MapPin, label: 'Mapa Interativo', desc: 'Todos os locais', color: 'from-sky-400 to-blue-600' },
         { href: '/gastronomia', icon: Beer, label: 'Bares & Restaurantes', desc: 'Onde comer e beber', color: 'from-orange-400 to-orange-600' },
@@ -247,8 +247,12 @@ export default function HomePageClient({
                                 key={biz.id}
                                 variants={itemVariants}
                                 onClick={() => {
-                                    setSelectedBusiness(biz);
-                                    setIsModalOpen(true);
+                                    if (!isPremium) {
+                                        openPaymentModal();
+                                    } else {
+                                        setSelectedBusiness(biz);
+                                        setIsModalOpen(true);
+                                    }
                                 }}
                                 className="flex-none w-[242px] h-[242px] snap-center rounded-xl overflow-hidden bg-white shadow-sm border border-surface-100 flex flex-col hover:shadow-md transition-shadow cursor-pointer relative"
                             >
@@ -269,6 +273,11 @@ export default function HomePageClient({
                                     {biz.is_partner && (
                                         <div className="absolute top-2 left-2">
                                             <span className="category-pill bg-white/90 text-carnival-700 shadow-sm backdrop-blur-sm text-[10px] px-2 py-1">Parceiro</span>
+                                        </div>
+                                    )}
+                                    {!isPremium && (
+                                        <div className="absolute top-2 right-2 bg-white/90 p-1.5 rounded-full shadow-sm backdrop-blur-sm">
+                                            <Lock size={14} className="text-surface-500" />
                                         </div>
                                     )}
                                 </div>
@@ -298,7 +307,16 @@ export default function HomePageClient({
             <section className="px-4 mt-8 mb-6 max-w-2xl mx-auto">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="font-display text-lg text-surface-900">Contatos de Emergência</h2>
-                    <button onClick={() => router.push('/contatos')} className="text-xs text-fire-600 font-semibold flex items-center gap-1">
+                    <button
+                        onClick={() => {
+                            if (!isPremium) {
+                                openPaymentModal();
+                            } else {
+                                router.push('/contatos');
+                            }
+                        }}
+                        className="text-xs text-fire-600 font-semibold flex items-center gap-1"
+                    >
                         Ver todas <ChevronRight size={14} />
                     </button>
                 </div>
@@ -336,7 +354,17 @@ export default function HomePageClient({
                     </motion.a>
 
                     {/* Taxi */}
-                    <motion.button variants={itemVariants} onClick={() => router.push('/contatos')} className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all relative overflow-hidden group text-left">
+                    <motion.button
+                        variants={itemVariants}
+                        onClick={() => {
+                            if (!isPremium) {
+                                openPaymentModal();
+                            } else {
+                                router.push('/contatos');
+                            }
+                        }}
+                        className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all relative overflow-hidden group text-left"
+                    >
                         <div className="flex items-start justify-between mb-3 w-full">
                             <div className="w-10 h-10 rounded-xl bg-amber-400 flex items-center justify-center shadow-sm">
                                 <Car size={20} className="text-white" />
@@ -357,7 +385,17 @@ export default function HomePageClient({
                     </motion.button>
 
                     {/* Mototaxi */}
-                    <motion.button variants={itemVariants} onClick={() => router.push('/contatos')} className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all relative overflow-hidden group text-left">
+                    <motion.button
+                        variants={itemVariants}
+                        onClick={() => {
+                            if (!isPremium) {
+                                openPaymentModal();
+                            } else {
+                                router.push('/contatos');
+                            }
+                        }}
+                        className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all relative overflow-hidden group text-left"
+                    >
                         <div className="flex items-start justify-between mb-3 w-full">
                             <div className="w-10 h-10 rounded-xl bg-green-500 flex items-center justify-center shadow-sm">
                                 <Car size={20} className="text-white" />

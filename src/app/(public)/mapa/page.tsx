@@ -8,6 +8,7 @@ import { CATEGORY_LABELS, SERVICE_CATEGORY_LABELS } from '@/lib/utils';
 import type { Business, Service } from '@/types';
 import type { MapMarker } from '@/components/public/InteractiveMap';
 import type { BusinessCategory, ServiceCategory } from '@/types';
+import PremiumGate from '@/components/public/PremiumGate';
 
 const InteractiveMap = dynamic(
   () => import('@/components/public/InteractiveMap'),
@@ -154,120 +155,122 @@ export default function MapaPage() {
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 px-4 relative">
-        {loading ? (
-          <div className="flex-1 bg-surface-100 rounded-xl animate-pulse flex items-center justify-center" style={{ height: 'calc(100vh - 200px)', minHeight: '400px' }}>
-            <div className="animate-spin w-8 h-8 border-4 border-fire-500 border-t-transparent rounded-full" />
-          </div>
-        ) : filteredMarkers.length === 0 ? (
-          <div className="text-center py-12">
-            <Store size={48} className="text-surface-300 mx-auto mb-4" />
-            <p className="text-surface-400">Nenhum local encontrado nesta categoria</p>
-          </div>
-        ) : viewMode === 'map' ? (
-          <InteractiveMap markers={filteredMarkers} />
-        ) : (
-          <div className="space-y-3 pb-20">
-            {filteredMarkers.map((item) => (
-              <div key={`${item.source}-${item.id}`} className="bg-white rounded-xl p-4 shadow-sm border border-surface-100 flex gap-4">
-                {/* Image */}
-                <div className="w-24 h-24 shrink-0 bg-surface-100 rounded-lg overflow-hidden relative">
-                  {item.image_url ? (
-                    <img
-                      src={item.image_url}
-                      alt={item.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-surface-300">
-                      <Store size={24} />
-                    </div>
-                  )}
-                </div>
+      <PremiumGate>
+        <div className="flex-1 px-4 relative">
+          {loading ? (
+            <div className="flex-1 bg-surface-100 rounded-xl animate-pulse flex items-center justify-center" style={{ height: 'calc(100vh - 200px)', minHeight: '400px' }}>
+              <div className="animate-spin w-8 h-8 border-4 border-fire-500 border-t-transparent rounded-full" />
+            </div>
+          ) : filteredMarkers.length === 0 ? (
+            <div className="text-center py-12">
+              <Store size={48} className="text-surface-300 mx-auto mb-4" />
+              <p className="text-surface-400">Nenhum local encontrado nesta categoria</p>
+            </div>
+          ) : viewMode === 'map' ? (
+            <InteractiveMap markers={filteredMarkers} />
+          ) : (
+            <div className="space-y-3 pb-20">
+              {filteredMarkers.map((item) => (
+                <div key={`${item.source}-${item.id}`} className="bg-white rounded-xl p-4 shadow-sm border border-surface-100 flex gap-4">
+                  {/* Image */}
+                  <div className="w-24 h-24 shrink-0 bg-surface-100 rounded-lg overflow-hidden relative">
+                    {item.image_url ? (
+                      <img
+                        src={item.image_url}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-surface-300">
+                        <Store size={24} />
+                      </div>
+                    )}
+                  </div>
 
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-1 mb-1">
-                    <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${item.source === 'service' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
-                      {getMarkerLabel(item)}
-                    </span>
-                    {item.is_partner && (
-                      <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">
-                        Parceiro
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-1 mb-1">
+                      <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${item.source === 'service' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                        {getMarkerLabel(item)}
                       </span>
-                    )}
-                  </div>
-
-                  <h3 className="font-bold text-sm text-surface-900 leading-tight mb-1">{item.name}</h3>
-
-                  {item.is_partner && (
-                    <div className="flex gap-0.5 mb-1">
-                      {[1, 2, 3, 4, 5].map((i) => (
-                        <Star key={i} size={10} className="text-amber-400 fill-amber-400" />
-                      ))}
+                      {item.is_partner && (
+                        <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">
+                          Parceiro
+                        </span>
+                      )}
                     </div>
-                  )}
 
-                  {item.description && (
-                    <p className="text-xs text-surface-500 line-clamp-1 mb-2">{item.description}</p>
-                  )}
+                    <h3 className="font-bold text-sm text-surface-900 leading-tight mb-1">{item.name}</h3>
 
-                  <div className="flex gap-2 mt-auto">
-                    {item.phone && (
-                      <a
-                        href={`tel:${item.phone.replace(/\D/g, '')}`}
-                        className="w-8 h-8 rounded-full bg-violet-600 text-white flex items-center justify-center shadow-sm"
-                      >
-                        <Phone size={16} />
-                      </a>
+                    {item.is_partner && (
+                      <div className="flex gap-0.5 mb-1">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <Star key={i} size={10} className="text-amber-400 fill-amber-400" />
+                        ))}
+                      </div>
                     )}
-                    {(item.whatsapp || item.phone) && (
-                      <a
-                        href={`https://wa.me/55${(item.whatsapp || item.phone || '').replace(/\D/g, '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-sm"
-                      >
-                        <MessageCircle size={16} />
-                      </a>
+
+                    {item.description && (
+                      <p className="text-xs text-surface-500 line-clamp-1 mb-2">{item.description}</p>
                     )}
-                    {(item.latitude && item.longitude) && (
-                      <a
-                        href={`https://www.google.com/maps/dir/?api=1&destination=${item.latitude},${item.longitude}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-sm"
-                      >
-                        <Navigation size={16} />
-                      </a>
-                    )}
+
+                    <div className="flex gap-2 mt-auto">
+                      {item.phone && (
+                        <a
+                          href={`tel:${item.phone.replace(/\D/g, '')}`}
+                          className="w-8 h-8 rounded-full bg-violet-600 text-white flex items-center justify-center shadow-sm"
+                        >
+                          <Phone size={16} />
+                        </a>
+                      )}
+                      {(item.whatsapp || item.phone) && (
+                        <a
+                          href={`https://wa.me/55${(item.whatsapp || item.phone || '').replace(/\D/g, '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-sm"
+                        >
+                          <MessageCircle size={16} />
+                        </a>
+                      )}
+                      {(item.latitude && item.longitude) && (
+                        <a
+                          href={`https://www.google.com/maps/dir/?api=1&destination=${item.latitude},${item.longitude}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-sm"
+                        >
+                          <Navigation size={16} />
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
 
-        {/* Toggle Button (Floating) */}
-        {!loading && markers.length > 0 && (
-          <button
-            onClick={() => setViewMode(prev => prev === 'map' ? 'list' : 'map')}
-            className="fixed bottom-20 left-4 z-50 flex items-center gap-2 px-4 py-3 rounded-full shadow-lg bg-surface-900 text-white font-semibold text-sm hover:scale-105 active:scale-95 transition-all"
-          >
-            {viewMode === 'map' ? (
-              <>
-                <List size={18} />
-                Ver Lista
-              </>
-            ) : (
-              <>
-                <MapIcon size={18} />
-                Ver Mapa
-              </>
-            )}
-          </button>
-        )}
-      </div>
+          {/* Toggle Button (Floating) */}
+          {!loading && markers.length > 0 && (
+            <button
+              onClick={() => setViewMode(prev => prev === 'map' ? 'list' : 'map')}
+              className="fixed bottom-20 left-4 z-50 flex items-center gap-2 px-4 py-3 rounded-full shadow-lg bg-surface-900 text-white font-semibold text-sm hover:scale-105 active:scale-95 transition-all"
+            >
+              {viewMode === 'map' ? (
+                <>
+                  <List size={18} />
+                  Ver Lista
+                </>
+              ) : (
+                <>
+                  <MapIcon size={18} />
+                  Ver Mapa
+                </>
+              )}
+            </button>
+          )}
+        </div>
+      </PremiumGate>
     </div>
   );
 }
