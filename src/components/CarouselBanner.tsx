@@ -11,7 +11,7 @@ interface CarouselBannerProps {
 }
 
 export function CarouselBanner({ ads }: CarouselBannerProps) {
-    const [emblaRef] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 5000 })]);
+    const [emblaRef] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 1000 })]);
 
     if (!ads || ads.length === 0) return null;
 
