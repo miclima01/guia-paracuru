@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { checkPremiumAccess } from '@/lib/premium';
 
 interface AppState {
   // Premium state
@@ -18,16 +17,11 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set) => ({
-  // Premium
-  isPremium: false,
+  // Premium - all users have free access
+  isPremium: true,
   setIsPremium: (isPremium) => set({ isPremium }),
   checkPremium: () => {
-    // Only check if window is defined (client-side)
-    if (typeof window !== 'undefined') {
-      import('@/lib/premium').then(({ checkPremiumAccess }) => {
-        set({ isPremium: checkPremiumAccess() });
-      });
-    }
+    set({ isPremium: true });
   },
 
   // Payment modal

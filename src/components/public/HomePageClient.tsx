@@ -1,16 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, type Variants } from 'framer-motion';
 import {
     Calendar, MapPin, Newspaper, Phone, Store, ChevronRight,
     Shield, Star, ArrowRight, Music,
-    Beer, ShoppingBag, Car, Lock
+    Beer, ShoppingBag, Car
 } from 'lucide-react';
 import { CATEGORY_LABELS } from '@/lib/utils';
-import { useAppStore } from '@/hooks/useStore';
 import NewsSlider from '@/components/public/NewsSlider';
 import EstablishmentModal from '@/components/public/EstablishmentModal';
 import type { NewsArticle, Business, BusinessCategory } from '@/types';
@@ -35,13 +34,6 @@ export default function HomePageClient({
     const router = useRouter();
     const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { isPremium, openPaymentModal, checkPremium } = useAppStore();
-
-    useEffect(() => {
-        checkPremium();
-    }, [checkPremium]);
-
-    const freeRoutes = ['/noticias', '/programacao'];
     const quickLinks = [
         { href: '/mapa', icon: MapPin, label: 'Mapa Interativo', desc: 'Todos os locais', color: 'from-sky-400 to-blue-600' },
         { href: '/gastronomia', icon: Beer, label: 'Bares & Restaurantes', desc: 'Onde comer e beber', color: 'from-orange-400 to-orange-600' },
@@ -175,25 +167,17 @@ export default function HomePageClient({
                 >
                     {quickLinks.map((link) => {
                         const Icon = link.icon;
-                        const isFree = freeRoutes.includes(link.href);
                         return (
                             <motion.button
                                 key={link.href}
                                 variants={itemVariants}
-                                onClick={() => {
-                                    if (!isFree && !isPremium) {
-                                        openPaymentModal();
-                                    } else {
-                                        router.push(link.href);
-                                    }
-                                }}
+                                onClick={() => router.push(link.href)}
                                 className="group relative overflow-hidden rounded-xl p-4 text-white shadow-lg active:scale-[0.97] transition-all min-w-[160px] flex-1 text-left"
                             >
                                 <div className={`absolute inset-0 bg-gradient-to-br ${link.color}`} />
                                 <div className="relative z-10">
                                     <div className="flex justify-between items-start">
                                         <Icon size={22} strokeWidth={2} />
-                                        {!isFree && !isPremium && <Lock size={16} className="text-white/80" />}
                                     </div>
                                     <p className="font-bold text-sm mt-2 leading-tight">{link.label}</p>
                                     <p className="text-[10px] text-white/70 mt-0.5">{link.desc}</p>
@@ -247,12 +231,8 @@ export default function HomePageClient({
                                 key={biz.id}
                                 variants={itemVariants}
                                 onClick={() => {
-                                    if (!isPremium) {
-                                        openPaymentModal();
-                                    } else {
-                                        setSelectedBusiness(biz);
-                                        setIsModalOpen(true);
-                                    }
+                                    setSelectedBusiness(biz);
+                                    setIsModalOpen(true);
                                 }}
                                 className="flex-none w-[242px] h-[242px] snap-center rounded-xl overflow-hidden bg-white shadow-sm border border-surface-100 flex flex-col hover:shadow-md transition-shadow cursor-pointer relative"
                             >
@@ -273,11 +253,6 @@ export default function HomePageClient({
                                     {biz.is_partner && (
                                         <div className="absolute top-2 left-2">
                                             <span className="category-pill bg-white/90 text-carnival-700 shadow-sm backdrop-blur-sm text-[10px] px-2 py-1">Parceiro</span>
-                                        </div>
-                                    )}
-                                    {!isPremium && (
-                                        <div className="absolute top-2 right-2 bg-white/90 p-1.5 rounded-full shadow-sm backdrop-blur-sm">
-                                            <Lock size={14} className="text-surface-500" />
                                         </div>
                                     )}
                                 </div>
@@ -308,13 +283,7 @@ export default function HomePageClient({
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="font-display text-lg text-surface-900">Contatos de Emergência</h2>
                     <button
-                        onClick={() => {
-                            if (!isPremium) {
-                                openPaymentModal();
-                            } else {
-                                router.push('/contatos');
-                            }
-                        }}
+                        onClick={() => router.push('/contatos')}
                         className="text-xs text-fire-600 font-semibold flex items-center gap-1"
                     >
                         Ver todas <ChevronRight size={14} />
@@ -356,24 +325,13 @@ export default function HomePageClient({
                     {/* Taxi */}
                     <motion.button
                         variants={itemVariants}
-                        onClick={() => {
-                            if (!isPremium) {
-                                openPaymentModal();
-                            } else {
-                                router.push('/contatos');
-                            }
-                        }}
+                        onClick={() => router.push('/contatos')}
                         className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all relative overflow-hidden group text-left"
                     >
                         <div className="flex items-start justify-between mb-3 w-full">
                             <div className="w-10 h-10 rounded-xl bg-amber-400 flex items-center justify-center shadow-sm">
                                 <Car size={20} className="text-white" />
                             </div>
-                            {!isPremium && (
-                                <div className="bg-amber-100 text-amber-700 p-1 rounded-md">
-                                    <Lock size={12} className="text-amber-500" />
-                                </div>
-                            )}
                         </div>
 
                         <div className="w-full">
@@ -387,24 +345,13 @@ export default function HomePageClient({
                     {/* Mototaxi */}
                     <motion.button
                         variants={itemVariants}
-                        onClick={() => {
-                            if (!isPremium) {
-                                openPaymentModal();
-                            } else {
-                                router.push('/contatos');
-                            }
-                        }}
+                        onClick={() => router.push('/contatos')}
                         className="flex flex-col justify-between h-full min-h-[9rem] p-4 rounded-xl bg-white shadow-sm border border-surface-100 active:scale-[0.98] transition-all relative overflow-hidden group text-left"
                     >
                         <div className="flex items-start justify-between mb-3 w-full">
                             <div className="w-10 h-10 rounded-xl bg-green-500 flex items-center justify-center shadow-sm">
                                 <Car size={20} className="text-white" />
                             </div>
-                            {!isPremium && (
-                                <div className="bg-amber-100 text-amber-700 p-1 rounded-md">
-                                    <Lock size={12} className="text-amber-500" />
-                                </div>
-                            )}
                         </div>
 
                         <div className="w-full">
@@ -416,34 +363,6 @@ export default function HomePageClient({
                     </motion.button>
                 </motion.div>
             </section>
-
-            {/* Premium CTA */}
-            {!isPremium && (
-                <motion.section
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={fadeInVariants}
-                    className="px-4 mb-8 max-w-2xl mx-auto"
-                >
-                    <button
-                        onClick={openPaymentModal}
-                        className="w-full relative overflow-hidden rounded-xl p-6 text-left"
-                    >
-                        <div className="absolute inset-0 carnival-gradient-dark" />
-                        <div className="absolute inset-0 premium-shimmer" />
-                        <div className="relative z-10">
-                            <h3 className="font-display text-lg font-semibold text-white mt-2">Acesso Premium</h3>
-                            <p className="text-sm text-white/70 mt-1">
-                                Desbloqueie toda a programação, contatos de transporte e mais por apenas R$ 1,99.
-                            </p>
-                            <span className="inline-flex items-center gap-1 mt-3 text-sm font-bold text-white">
-                                Desbloquear agora <ArrowRight size={14} />
-                            </span>
-                        </div>
-                    </button>
-                </motion.section>
-            )}
 
             {/* Commercial Opportunity Banner */}
             <motion.section

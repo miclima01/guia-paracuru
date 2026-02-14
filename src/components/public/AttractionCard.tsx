@@ -1,19 +1,18 @@
 'use client';
 
 import Image from 'next/image';
-import { MapPin, Music, Star, Lock, Instagram, ExternalLink } from 'lucide-react';
+import { MapPin, Music, Star } from 'lucide-react';
 import { Attraction } from '@/types';
 import { formatTime, cn } from '@/lib/utils';
 
 interface AttractionCardProps {
     attraction: Attraction;
-    isPremium: boolean;
+    isPremium?: boolean;
     onUnlock?: () => void;
     onClick?: () => void;
 }
 
-export default function AttractionCard({ attraction, isPremium, onUnlock, onClick }: AttractionCardProps) {
-    const isLocked = attraction.is_premium && !isPremium;
+export default function AttractionCard({ attraction, onClick }: AttractionCardProps) {
 
     return (
         <div
@@ -49,12 +48,6 @@ export default function AttractionCard({ attraction, isPremium, onUnlock, onClic
                             DESTAQUE
                         </div>
                     )}
-                    {attraction.is_premium && (
-                        <div className="bg-fire-500 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-md">
-                            <Star size={10} fill="currentColor" />
-                            PREMIUM content
-                        </div>
-                    )}
                 </div>
 
                 {/* Music Icon Overlay (Decorative) */}
@@ -73,13 +66,6 @@ export default function AttractionCard({ attraction, isPremium, onUnlock, onClic
                 </div>
                 <div className="flex justify-between items-start">
                     <div className="w-full">
-                        {/* Locked State Badge */}
-                        {isLocked && (
-                            <div className="inline-flex items-center gap-1 bg-surface-100 text-surface-500 px-2 py-0.5 rounded textxs font-medium mb-2">
-                                <Lock size={12} />
-                                Premium
-                            </div>
-                        )}
                         <h3 className={cn(
                             "font-display text-lg leading-tight",
                             attraction.is_featured ? "text-white" : "text-surface-900"
@@ -138,15 +124,6 @@ export default function AttractionCard({ attraction, isPremium, onUnlock, onClic
                     </div>
                 </div>
 
-                {/* Unlock Button (Mobile friendly) */}
-                {isLocked && onUnlock && (
-                    <button
-                        onClick={onUnlock}
-                        className="mt-4 w-full py-2 bg-surface-900 text-white text-xs font-bold rounded-lg active:scale-95 transition-transform md:hidden"
-                    >
-                        Desbloquear Detalhes
-                    </button>
-                )}
             </div>
         </div >
     );
